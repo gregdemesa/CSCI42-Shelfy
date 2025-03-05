@@ -19,5 +19,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('media/', include('media.urls')),
     path('library/', include('user_library.urls')),
 ]
