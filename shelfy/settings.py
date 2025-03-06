@@ -46,11 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< Updated upstream
     'user_management',
     'user_library',
     'shelfy',
->>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
