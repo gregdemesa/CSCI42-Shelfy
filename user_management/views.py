@@ -32,8 +32,8 @@ class UserRegistrationView(CreateView):
         login(self.request, user) # auto-login after registration
         messages.success(self.request, "Registration successful!")
         return super().form_valid(form)
-
-
+    
+    
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'user_management/dashboard.html'
 
