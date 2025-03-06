@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Your Library</h1>
+
+{% if library %}
+    <ul>
+        {% for entry in library %}
+            <li>
+                <strong>{{ entry.media.title }}</strong> ({{ entry.media.media_type }})  
+                - {{ entry.status }} | Rating: {{ entry.rating }}  
+                <br>
+                <a href="{% url 'user_library:edit' entry.id %}">Edit</a> |  
+                <a href="{% url 'user_library:delete' entry.id %}">Remove</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Your library is empty. <a href="{% url 'media:search' %}">Search for media</a> to add.</p>
+{% endif %}
+
+{% endblock %}
