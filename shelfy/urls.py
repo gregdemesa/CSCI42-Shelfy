@@ -16,10 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth import views as auth_views
 from .views import MediaAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('user/', include('user_management.urls')),
     path("search/", MediaAPI.as_view(), name="media_search"),
     path("<str:media_type>/<str:external_id>/", MediaAPI.as_view(), name="media_detail"),
+<<<<<<< Updated upstream
+=======
+    path('login/', auth_views.LoginView.as_view(template_name="user_management/login.html"), name="login"),
+    path('logout/', auth_views.LogoutView.as_view(), name="logout"),
+    
+>>>>>>> Stashed changes
 ]
