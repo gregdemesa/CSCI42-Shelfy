@@ -50,7 +50,7 @@
     {% block content %}{% endblock content %}
     <!-- login/logout forms -->
     {% block form %}
-        {% if request.user.is_authenticated %}
+        <!-- {% if request.user.is_authenticated %}
             <form method="POST" action="{% url 'logout' %}">
                 {% csrf_token %} 
                 {{ form.as_p }}
@@ -62,7 +62,7 @@
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-light">Log In</button>
             </form>
-        {% endif %}
+        {% endif %} -->
     {% endblock form%}
 </div>
 
