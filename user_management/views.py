@@ -1,52 +1,37 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import ProfileForm, CreateProfileForm, UserRegistrationForm
-from .models import Profile
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import UpdateView, CreateView, TemplateView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.models import User
+from .models import Profile
+from .forms import ProfileForm, UserRegistrationForm
 
 
-@login_required
-def profile_update(request):
-    profile = request.user.profile
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('/homepage')
-    else:
-        form = ProfileForm(instance=profile)
-    return render(request, 'profile_update.html', {'form': form})
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = Profile
+    form_class = ProfileForm
+    template_name = 'user_management/update_profile.html'
+    success_url = reverse_lazy('user_management:update_profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile
 
 
-def profile_create(request):
-    if request.method == 'POST':
-        form = CreateProfileForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/homepage')
-    else:
-        form = CreateProfileForm()
-    return render(request, 'profile_create.html', {'form': form})
+class UserRegistrationView(CreateView):
+    model = User
+    form_class = UserRegistrationForm
+    template_name = 'user_management/register.html'
+    success_url = reverse_lazy('login')  # redirect to login after registration
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 
-def user_create(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/homepage')
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'register.html', {'form': form})
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_management/dashboard.html'
 
-
-@login_required
-def dashboard_view(request):
-    profile = request.user.profile
-    username = request.user.username
-
-    context = {
-        'profile': profile,
-        'username': username,
-    }
-    return render(request, 'dashboard.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.request.user.profile
+        context['username'] = self.request.user.username
+        return context
