@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from .views import MediaAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('media/', include('media.urls')),
+    path("search/", MediaAPI.as_view(), name="media_search"),
+    path("<str:media_type>/<str:external_id>/", MediaAPI.as_view(), name="media_detail"),
 ]
