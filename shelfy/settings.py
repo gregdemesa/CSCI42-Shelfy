@@ -46,9 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_management',
     'user_library',
     'shelfy',
+    'user_management',
 ]
 
 MIDDLEWARE = [
@@ -130,9 +130,18 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 LOGIN_URL = "/login"
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/home'
 LOGIN_REDIRECT_URL = '/user/dashboard'
+# Email settings for password reset
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'  # Your email address
+EMAIL_HOST_PASSWORD = 'your-app-password'  # Your email password or app password
 
+# For development/testing, you can use the console backend instead
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
