@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "b-r+tky55mt^7a3b32_u3x6#_@e53l6eaw_iq2rbz_--_%&n4+"
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 GOOGLE_BOOKS_API_KEY = os.getenv('GOOGLE_BOOKS_API_KEY')
 TMDB_API_KEY = os.getenv('TMDB_API_KEY')
@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shelfy',
     'user_management',
+    'chartjs',
+    'rest_framework',
+    'charts',
 ]
 
 MIDDLEWARE = [
