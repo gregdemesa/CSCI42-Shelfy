@@ -40,6 +40,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'chartjs',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,8 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shelfy',
     'user_management',
-    'chartjs',
-    'rest_framework',
     'charts',
 ]
 
