@@ -13,22 +13,27 @@
   
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
-  
-  
-  
 </head> 
+
 {% block content %}
 <div class="container-fluid"> 
   <center class="row"> 
-    <h1>Your Statistics</h1> 
+    <h1 style="color:aliceblue">Your Statistics</h1> 
   </center> 
   <hr /> 
   <div class="row"> 
-    <div class="col-md-6"> 
+    <div class="col-md-2"> 
       <h1>hi</h1>
-      <canvas id="myChart"></canvas> 
+      <canvas id="myPieChart"></canvas> 
     </div> 
-    
+    <div class="col-md-4"> 
+      <h1>hi</h1>
+      <canvas id="myBarChart"></canvas> 
+    </div> 
+    <div class="col-md-4"> 
+      <h1>hi</h1>
+      <canvas id="myBar2Chart"></canvas> 
+    </div> 
   </div> 
 {% endblock content %}
 
@@ -38,16 +43,21 @@
   
 <script> 
   var endpoint = '/api'; 
-  const ctx = document.getElementById('myChart');
+  const pie = document.getElementById('myPieChart');
+  const bar = document.getElementById('myBarChart');
+  const bar2 = document.getElementById('myBar2Chart');
+  
+  Chart.defaults.color = '#FFFFFF';
 
-  new Chart(ctx, {
+  new Chart(bar, {
     type: 'bar',
     data: {
       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
       datasets: [{
         label: '# of Votes',
         data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
+        borderWidth: 1,
+        backgroundColor: '#000000',
       }]
     },
     options: {
@@ -57,6 +67,41 @@
         }
       }
     }
+  });
+
+  new Chart(bar2, {
+    type: 'line',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        borderWidth: 1,
+        backgroundColor: '#000000',
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  new Chart(pie, {
+    type: 'pie',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        
+      }]
+    },
+    options: {
+      
+    },
   });
 </script>
 {% endblock scripts %}
