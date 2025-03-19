@@ -6,8 +6,8 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.middleware.csrf import get_token
 from django.contrib import messages
-from django.http import JsonResponse
-from django.urls import reverse_lazy
+from django.http import Http404, JsonResponse
+from django.urls import reverse
 from .models import UserLibraryItem
 from .forms import LibraryItemEditForm
 from shelfy.models import Media
@@ -82,6 +82,9 @@ class EditLibraryItemView(LoginRequiredMixin, UpdateView):
             return get_object_or_404(UserLibraryItem, id=id_tuple[0])
         else:
             raise Http404("Item not found")
+    
+    def get_success_url(self):
+        return reverse("user_library:index")
 
 
 class UpdateLibraryStatusView(LoginRequiredMixin, View):
