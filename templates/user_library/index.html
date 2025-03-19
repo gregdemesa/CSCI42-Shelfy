@@ -11,7 +11,28 @@
                         <img src="{{ entry.media.cover_image }}" class="card-img-top" alt="{{ entry.media.title }}">
                         <div class="card-body text-center">
                             <h5 class="card-title">{{ entry.media.title }}</h5>
-                            <p class="card-text text-muted">{{ entry.get_status_display }}</p>
+
+                            <!-- inline status edit dropdown -->
+                            <form class="status-form" data-item-id="{{ entry.id }}">
+                                {% csrf_token %}
+                                <select class="form-select status-dropdown">
+                                    {% for value, label in entry.STATUS_CHOICES %}
+                                        <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>                       
+
+                            <!-- show rating only for completed or dropped -->
+                            {% if entry.status == "completed" or entry.status == "dropped" %}
+                                <p class="text-muted">{{ entry.rating|default:"Unrated" }}</p>
+                                {% else %}
+                                <p class="text-muted" style="display: none;">{{ entry.rating|default:"Unrated" }}</p>
+                            {% endif %}
+
+                            <!-- edit button -->
+                            <a href="{% url 'user_library:edit' entry.id %}" class="btn btn-primary btn-sm">Edit</a>
                         </div>
                     </div>
                 </div>
@@ -21,4 +42,46 @@
         <p>You haven't added any media to your library yet.</p>
     {% endif %}
 </div>
+
+<script>
+    document.querySelectorAll('.status-form').forEach(form => {
+        form.addEventListener('change', function (event) {
+            event.preventDefault();
+
+            let itemId = this.getAttribute('data-item-id');
+            let statusDropdown = this.querySelector('.status-dropdown');
+            let newStatus = statusDropdown.value;
+
+            fetch(`/library/update/${itemId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Status updated successfully!");
+
+                    // live UI Update (hide rating if status isn't completed/dropped)
+                    let entryCard = form.closest(".card-body");
+                    let ratingField = entryCard.querySelector(".rating-field");
+                    let reviewField = entryCard.querySelector(".review-field");
+
+                    if (newStatus === "completed" || newStatus === "dropped") {
+                        ratingField.style.display = "block";
+                    } else {
+                        ratingField.style.display = "none";
+                    }
+                } else {
+                    alert("Failed to update status.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+</script>
+
 {% endblock %}

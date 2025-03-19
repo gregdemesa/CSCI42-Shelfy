@@ -19,6 +19,7 @@ class UserLibraryItem(models.Model):
         blank=True, null=True, choices=[(i, str(i)) for i in range(1, 6)]
     )
     review = models.TextField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     date_added = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)

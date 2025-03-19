@@ -1,10 +1,16 @@
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, View
+from django.views.generic import ListView, UpdateView
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.contrib import messages
+from django.http import JsonResponse
+from django.urls import reverse_lazy
+from .models import UserLibraryItem
+from .forms import LibraryItemEditForm
 from shelfy.models import Media
 from shelfy.api_utils import MediaAPIClient
-from .models import UserLibraryItem
 
 class LibraryIndexView(LoginRequiredMixin, ListView):
     model = UserLibraryItem
@@ -59,3 +65,31 @@ class AddToLibraryView(LoginRequiredMixin, View):
             formatted_data["studio"] = media_data.get("studio")
 
         return formatted_data
+    
+
+class EditLibraryItemView(LoginRequiredMixin, UpdateView):
+    model = UserLibraryItem
+    form_class = LibraryItemEditForm
+    template_name = "user_library/edit.html"
+    
+    def get_success_url(self):
+        return reverse_lazy("user_library:index")
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateLibraryStatusView(LoginRequiredMixin, View):
+    def post(self, request, item_id):
+        item = get_object_or_404(UserLibraryItem, id=item_id, user=request.user)
+        new_status = request.POST.get("status")
+
+        if new_status in dict(UserLibraryItem.STATUS_CHOICES):
+            item.status = new_status
+            item.save()
+
+            # return updated status + CSRF token for security
+            return JsonResponse({
+                "success": True,
+                "new_status": item.get_status_display(),
+                "csrf_token": get_token(request)
+            })
+        return JsonResponse({"success": False, "error": "Invalid status"}, status=400)
