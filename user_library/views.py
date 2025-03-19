@@ -93,3 +93,11 @@ class UpdateLibraryStatusView(LoginRequiredMixin, View):
                 "csrf_token": get_token(request)
             })
         return JsonResponse({"success": False, "error": "Invalid status"}, status=400)
+
+    
+class DeleteLibraryItemView(LoginRequiredMixin, View):
+    def post(self, request, item_id, *args, **kwargs):
+        entry = get_object_or_404(UserLibraryItem, id=item_id, user=request.user)
+        entry.delete()
+        messages.success(request, "Media removed from your library.")
+        return redirect("user_library:index")
