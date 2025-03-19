@@ -12,6 +12,7 @@ from .models import UserLibraryItem
 from .forms import LibraryItemEditForm
 from shelfy.models import Media
 from shelfy.api_utils import MediaAPIClient
+from hashids import Hashids
 
 class LibraryIndexView(LoginRequiredMixin, ListView):
     model = UserLibraryItem
@@ -68,13 +69,19 @@ class AddToLibraryView(LoginRequiredMixin, View):
         return formatted_data
     
 
+hashids = Hashids(salt="your_secret_salt", min_length=6)
 class EditLibraryItemView(LoginRequiredMixin, UpdateView):
     model = UserLibraryItem
     form_class = LibraryItemEditForm
     template_name = "user_library/edit.html"
-    
-    def get_success_url(self):
-        return reverse_lazy("user_library:index")
+
+    def get_object(self, queryset=None):
+        hashid = self.kwargs.get("hashid")
+        id_tuple = hashids.decode(hashid)
+        if id_tuple:
+            return get_object_or_404(UserLibraryItem, id=id_tuple[0])
+        else:
+            raise Http404("Item not found")
 
 
 class UpdateLibraryStatusView(LoginRequiredMixin, View):

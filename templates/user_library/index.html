@@ -43,7 +43,7 @@
                             <!-- buttons -->
                             <div class="mt-auto w-100">
                                 <div class="d-flex justify-content-center gap-3">
-                                    <a href="{% url 'user_library:edit' entry.id %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                    <a href="{% url 'user_library:edit' entry.get_hashed_id %}" class="btn btn-outline-primary btn-sm">Edit</a>
                                     <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-item-id="{{ entry.id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                         Delete
                                     </button>

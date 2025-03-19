@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from shelfy.models import Media
+from hashids import Hashids
+
+hashids = Hashids(salt="your_secret_salt", min_length=6)
 
 class UserLibraryItem(models.Model):
     STATUS_CHOICES = [
@@ -23,6 +26,9 @@ class UserLibraryItem(models.Model):
 
     date_added = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+
+    def get_hashed_id(self):
+        return hashids.encode(self.id)
 
     class Meta:
         unique_together = ("user", "media")
