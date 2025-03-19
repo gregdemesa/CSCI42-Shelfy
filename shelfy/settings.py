@@ -47,8 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user_management',
-    'user_library',
     'shelfy',
+    'user_library',
 ]
 
 MIDDLEWARE = [

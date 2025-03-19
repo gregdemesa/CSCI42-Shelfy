@@ -1,47 +1,61 @@
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from .models import UserLibrary
-from .forms import UserLibraryForm
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, View
+from django.contrib import messages
+from shelfy.models import Media
+from shelfy.api_utils import MediaAPIClient
+from .models import UserLibraryItem
 
-class LibraryIndexView(ListView):
-    model = UserLibrary
-    template_name = 'user_library/index.html'
-    context_object_name = 'library'
-
-    def get_queryset(self):
-        return UserLibrary.objects.filter(user=self.request.user)
-
-class AddToLibraryView(CreateView):
-    model = UserLibrary
-    form_class = UserLibraryForm
-    template_name = 'user_library/add_to_library.html'
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy('user_library:index')
-
-class EditLibraryEntryView(UpdateView):
-    model = UserLibrary
-    form_class = UserLibraryForm
-    template_name = 'user_library/edit_library_entry.html'
+class LibraryIndexView(LoginRequiredMixin, ListView):
+    model = UserLibraryItem
+    template_name = "user_library/index.html"
+    context_object_name = "library"
 
     def get_queryset(self):
-        return UserLibrary.objects.filter(user=self.request.user)
+        return UserLibraryItem.objects.filter(user=self.request.user)
 
-    def get_success_url(self):
-        return reverse_lazy('user_library:index')
 
-class DeleteLibraryEntryView(DeleteView):
-    model = UserLibrary
-    template_name = 'user_library/delete_library_entry.html'
+class AddToLibraryView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):        
+        media_type = request.POST.get("media_type")
+        external_id = request.POST.get("external_id")
 
-    def get_queryset(self):
-        return UserLibrary.objects.filter(user=self.request.user)
+        # try to get the media from the database
+        media, created = Media.objects.get_or_create(
+            external_id=external_id,
+            media_type=media_type,
+            defaults=self.fetch_and_format_media(media_type, external_id),
+        )
 
-    def get_success_url(self):
-        return reverse_lazy('user_library:index')
+        # check if media is already in user library
+        if not UserLibraryItem.objects.filter(user=request.user, media=media).exists():
+            UserLibraryItem.objects.create(user=request.user, media=media, status="planned")
+            messages.success(request, f"{media.title} has been added to your library!")
+        else:
+            messages.info(request, f"{media.title} is already in your library.")
+
+        return redirect("user_library:index")  # redirect to library index
+    
+    def fetch_and_format_media(self, media_type, external_id):
+        media_data = MediaAPIClient.get_media_details(media_type, external_id)
+        
+        if "error" in media_data:
+            messages.error(self.request, "Failed to retrieve media details from API.")
+            return {}
+
+        formatted_data = {
+            "title": media_data.get("title"),
+            "description": media_data.get("description"),
+            "cover_image": media_data.get("cover_image"),
+            "release_year": media_data.get("release_year"),
+            "genre": media_data.get("genre"),
+        }
+
+        if media_type == "book":
+            formatted_data["author"] = media_data.get("author")
+        elif media_type == "movie":
+            formatted_data["director"] = media_data.get("director")
+        elif media_type == "game":
+            formatted_data["studio"] = media_data.get("studio")
+
+        return formatted_data

@@ -1,26 +1,27 @@
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views import View
 from .api_utils import MediaAPIClient
 
-class MediaSearchView(View):
-    """
-    Handles searching for books, movies, and games.
-    """
 
-    def get(self, request, media_type=None):
+class MediaSearchView(View):
+    def get(self, request):
         query = request.GET.get("q")
+        media_type = request.GET.get("media_type", "")
+
         if not query:
-            return JsonResponse({"error": "Query parameter 'q' is required."}, status=400)
+            return render(request, "media/search.html", {"search_results": [], "query": query, "media_type": media_type})
 
         results = MediaAPIClient.search_media(query, media_type)
-        return JsonResponse({"results": results})
+        return render(request, "media/search.html", {"search_results": results, "query": query, "media_type": media_type})
 
 
 class MediaDetailView(View):
-    """
-    Fetches detailed information for a specific media item.
-    """
-
     def get(self, request, media_type, external_id):
         details = MediaAPIClient.get_media_details(media_type, external_id)
-        return JsonResponse(details)
+
+        if not details:
+            return JsonResponse({"error": "Media not found"}, status=404)
+
+        return render(request, "media/media_detail.html", {"media": details, "media_type": media_type, "external_id": external_id})
+

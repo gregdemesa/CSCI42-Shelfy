@@ -1,13 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Add to Library</h1>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Cover Image -->
+        <div class="col-md-4 text-center">
+            <img src="{{ media.cover_image }}" alt="{{ media.title }}" class="shadow-lg"
+                 style="width: 100%; max-width: 300px; height: 450px; object-fit: cover; border-radius: 8px;">
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add</button>
-</form>
+        <!-- Details & Form -->
+        <div class="col-md-8">
+            <h1 class="fw-bold">{{ media.title }}</h1>
+            <p class="text-muted">
+                {% if media.author %}By <strong>{{ media.author }}</strong>{% endif %}
+                {% if media.director %}Directed by <strong>{{ media.director }}</strong>{% endif %}
+                {% if media.studio %}Developed by <strong>{{ media.studio }}</strong>{% endif %}
+            </p>
 
-<a href="{% url 'user_library:index' %}">Back to Library</a>
+            <p class="small text-muted">
+                {% if media.release_year %}{{ media.release_year }}{% endif %}
+                {% if media.genre %} • {{ media.genre }}{% endif %}
+            </p>
+
+            <form method="POST" action="{% url 'user_library:add' %}">
+                {% csrf_token %}
+                <input type="hidden" name="media_type" value="{{ media.media_type }}">
+                <input type="hidden" name="external_id" value="{{ media.external_id }}">
+
+                <!-- Status Selection -->
+                <label for="status" class="mt-3 fw-bold">Select Status:</label>
+                <select name="status" id="status" class="form-select mb-3">
+                    <option value="planned">Planned</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-dark w-100">Add to Library</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
