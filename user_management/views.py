@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 from django.views.generic import CreateView, TemplateView, UpdateView
 
 from .forms import ProfileForm, UserRegistrationForm
@@ -25,13 +26,15 @@ class UserRegistrationView(CreateView):
     model = User
     form_class = UserRegistrationForm
     template_name = 'user_management/register.html'
-    success_url = reverse_lazy('user_management:dashboard') # redirect to dashboard after registration
 
     def form_valid(self, form):
         user = form.save()
         login(self.request, user) # auto-login after registration
         messages.success(self.request, "Registration successful!")
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
+    
+    def get_success_url(self):
+        return reverse_lazy('user_management:dashboard')
     
     
 class DashboardView(LoginRequiredMixin, TemplateView):
