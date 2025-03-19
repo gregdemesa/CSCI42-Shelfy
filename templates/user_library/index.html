@@ -7,13 +7,14 @@
         <div class="row">
             {% for entry in library %}
                 <div class="col-md-3 mb-4">
-                    <div class="card shadow">
-                        <img src="{{ entry.media.cover_image }}" class="card-img-top" alt="{{ entry.media.title }}">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">{{ entry.media.title }}</h5>
+                    <div class="card shadow-sm border-0 rounded h-100">
+                        <img src="{{ entry.media.cover_image }}" class="card-img-top rounded-top" alt="{{ entry.media.title }}">
+                
+                        <div class="card-body d-flex flex-column align-items-center text-center">
+                            <h6 class="card-title fw-bold mb-3">{{ entry.media.title }}</h6>
 
                             <!-- inline status edit dropdown -->
-                            <form class="status-form" data-item-id="{{ entry.id }}">
+                            <form class="status-form mb-3 w-100" data-item-id="{{ entry.id }}">
                                 {% csrf_token %}
                                 <select class="form-select status-dropdown">
                                     {% for value, label in entry.STATUS_CHOICES %}
@@ -22,25 +23,35 @@
                                         </option>
                                     {% endfor %}
                                 </select>
-                            </form>                       
+                            </form>                        
 
                             <!-- show rating only for completed or dropped -->
                             {% if entry.status == "completed" or entry.status == "dropped" %}
-                                <p class="text-muted">{{ entry.rating|default:"Unrated" }}</p>
-                                {% else %}
-                                <p class="text-muted" style="display: none;">{{ entry.rating|default:"Unrated" }}</p>
+                                <div class="small">
+                                    {% with rating=entry.rating|default:0|floatformat:0 %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= rating|add:0 %}
+                                                ★
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                </div>
                             {% endif %}
 
                             <!-- buttons -->
-                            <div class="d-flex justify-content-center mt-3">
-                                <a href="{% url 'user_library:edit' entry.id %}" class="btn btn-primary btn-sm me-2">Edit</a>
-                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ entry.id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                    Delete
-                                </button>
+                            <div class="mt-auto w-100">
+                                <div class="d-flex justify-content-center gap-3">
+                                    <a href="{% url 'user_library:edit' entry.id %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-item-id="{{ entry.id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>                
             {% endfor %}
         </div>
     {% else %}
@@ -74,11 +85,12 @@
             let itemId = this.getAttribute('data-item-id');
             let statusDropdown = this.querySelector('.status-dropdown');
             let newStatus = statusDropdown.value;
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
             fetch(`/library/update/${itemId}/`, {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    "X-CSRFToken": csrfToken,
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 body: new URLSearchParams({ status: newStatus })
@@ -87,15 +99,21 @@
             .then(data => {
                 if (data.success) {
                     console.log("Status updated successfully!");
-
+                    
+                    // update UI instantly
                     let entryCard = form.closest(".card-body");
                     let ratingField = entryCard.querySelector(".rating-field");
-                    let reviewField = entryCard.querySelector(".review-field");
 
                     if (newStatus === "completed" || newStatus === "dropped") {
                         ratingField.style.display = "block";
                     } else {
                         ratingField.style.display = "none";
+                    }
+
+                    // refresh CSRF token if changed
+                    if (data.csrf_token) {
+                        let csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+                        if (csrfInput) csrfInput.value = data.csrf_token;
                     }
                 } else {
                     alert("Failed to update status.");

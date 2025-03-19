@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, UpdateView
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.http import require_POST
+from django.middleware.csrf import get_token
 from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse_lazy
@@ -76,8 +77,8 @@ class EditLibraryItemView(LoginRequiredMixin, UpdateView):
         return reverse_lazy("user_library:index")
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class UpdateLibraryStatusView(LoginRequiredMixin, View):
+    @method_decorator(require_POST)
     def post(self, request, item_id):
         item = get_object_or_404(UserLibraryItem, id=item_id, user=request.user)
         new_status = request.POST.get("status")
