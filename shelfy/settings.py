@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'shelfy',
     'user_management',
     'charts',
+    'user_library',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +131,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-LOGIN_REDIRECT_URL = reverse_lazy('user_management:dashboard')
+
+LOGIN_URL = "/login"
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/user/dashboard'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

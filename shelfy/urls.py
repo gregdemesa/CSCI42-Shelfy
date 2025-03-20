@@ -15,18 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.contrib.auth import views as auth_views
-from .views import MediaAPI
+from .views import MediaSearchView, MediaDetailView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user_management.urls')),
-    path("search/", MediaAPI.as_view(), name="media_search"),
-    path("<str:media_type>/<str:external_id>/", MediaAPI.as_view(), name="media_detail"),
+    path('library/', include('user_library.urls')),
+    path("search/", MediaSearchView.as_view(), name="media_search"),
+    path("<str:media_type>/<str:external_id>/", MediaDetailView.as_view(), name="media_detail"),
     path('login/', auth_views.LoginView.as_view(template_name="user_management/login.html"), name="login"),
     path('logout/', auth_views.LogoutView.as_view(), name="logout"),
     path('', include('charts.urls', namespace='statistics')),
-
 ]
