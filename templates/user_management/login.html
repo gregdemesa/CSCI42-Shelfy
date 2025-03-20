@@ -4,144 +4,370 @@
 
 {% block content %}
 <style>
-    .login-container {
-        max-width: 400px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background-color: white;
-        border-radius: 0.5rem;
-        color: #333333;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    .login-section {
+        padding: 2rem 0;
     }
-
+    
+    .login-container {
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 2.5rem;
+        background-color: var(--white);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dark-mode .login-container {
+        background-color: #16213e;
+    }
+    
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgba(78, 205, 196, 0.2);
+        z-index: 0;
+    }
+    
+    .login-container::after {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        left: -50px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgba(255, 107, 107, 0.2);
+        z-index: 0;
+    }
+    
     .login-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
     }
-
+    
     .login-header h1 {
-        font-size: 1.75rem;
+        font-size: 2.2rem;
+        font-weight: 800;
         margin-bottom: 0.5rem;
-        color: #2D336B;
+        color: var(--primary);
+        letter-spacing: -0.5px;
     }
-
+    
     .login-header p {
-        color: #666666;
+        color: var(--gray);
+        font-size: 1.1rem;
     }
-
+    
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.8rem;
+        position: relative;
+        z-index: 1;
     }
-
+    
     .form-group label {
         display: block;
-        margin-bottom: 0.5rem;
-        color: #2D336B;
-        font-weight: 500;
+        margin-bottom: 0.7rem;
+        color: var(--dark);
+        font-weight: 600;
+        font-size: 0.95rem;
     }
-
+    
+    .dark-mode .form-group label {
+        color: var(--light);
+    }
+    
     .form-control {
         width: 100%;
-        padding: 0.5rem;
-        background-color: white;
-        border: 1px solid #e0d9c5;
-        border-radius: 0.375rem;
-        color: #333333;
+        padding: 0.8rem 1rem;
+        background-color: var(--white);
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        color: var(--dark);
+        font-size: 1rem;
+        transition: all 0.3s ease;
     }
-
+    
+    .dark-mode .form-control {
+        background-color: #1e2746;
+        border-color: #2c3a5a;
+        color: var(--light);
+    }
+    
     .form-control:focus {
-        background-color: #ffffff;
-        border-color: #2D336B;
-        box-shadow: 0 0 0 0.25rem rgba(45, 51, 107, 0.25);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(45, 51, 107, 0.15);
     }
-
+    
     .password-wrapper {
         position: relative;
-        display: flex;
-        align-items: center;
     }
-
-    .password-wrapper input {
-        flex-grow: 1;
-    }
-
+    
     .toggle-password {
         position: absolute;
-        right: 10px;
+        right: 15px;
         top: 50%;
         transform: translateY(-50%);
         background: none;
         border: none;
         cursor: pointer;
         font-size: 1rem;
-        color: #2D336B;
+        color: var(--gray);
+        transition: all 0.3s ease;
+        z-index: 2;
     }
-
+    
+    .toggle-password:hover {
+        color: var(--primary);
+    }
+    
     .btn-login {
         width: 100%;
-        background-color: #2D336B;
+        padding: 0.9rem;
+        background-color: var(--primary);
         color: white;
-        padding: 0.75rem;
         border: none;
-        border-radius: 0.375rem;
-        font-weight: 500;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
         cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
     }
-
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: all 0.6s ease;
+    }
+    
     .btn-login:hover {
-        background-color: #3a4180;
+        background-color: var(--primary-light);
+        transform: translateY(-3px);
+        box-shadow: 0 7px 14px rgba(45, 51, 107, 0.2);
     }
-
+    
+    .btn-login:hover::before {
+        left: 100%;
+    }
+    
     .signup-text {
         text-align: center;
-        margin-top: 1rem;
+        margin-top: 1.5rem;
+        color: var(--gray);
+        font-size: 0.95rem;
     }
-
+    
     .signup-text a {
-        color: #2D336B;
-        font-weight: 500;
+        color: var(--primary);
+        font-weight: 600;
         text-decoration: none;
+        transition: all 0.3s ease;
     }
-
+    
     .signup-text a:hover {
+        color: var(--secondary);
         text-decoration: underline;
+    }
+    
+    .forgot-password {
+        display: block;
+        text-align: right;
+        margin-top: -1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .forgot-password a {
+        color: var(--gray);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .forgot-password a:hover {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+    
+    .social-login {
+        margin-top: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .social-login-divider {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .social-login-divider::before,
+    .social-login-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background-color: #e0e0e0;
+    }
+    
+    .dark-mode .social-login-divider::before,
+    .dark-mode .social-login-divider::after {
+        background-color: #2c3a5a;
+    }
+    
+    .social-login-divider span {
+        padding: 0 1rem;
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+    
+    .social-login-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        color: var(--dark);
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .dark-mode .social-btn {
+        background-color: #1e2746;
+        border-color: #2c3a5a;
+        color: var(--light);
+    }
+    
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .social-btn.google:hover {
+        color: #DB4437;
+    }
+    
+    .social-btn.apple:hover {
+        color: #000000;
+    }
+    
+    .social-btn.twitter:hover {
+        color: #1DA1F2;
+    }
+    
+    /* Animation */
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    
+    .floating-element {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 576px) {
+        .login-container {
+            padding: 2rem 1.5rem;
+            margin: 0 1rem;
+        }
+        
+        .login-header h1 {
+            font-size: 1.8rem;
+        }
     }
 </style>
 
-<div class="login-container">
-    <div class="login-header">
-        <h1>Welcome back</h1>
-        <p>Login to your SHELFY account</p>
-    </div>
-
-    <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{% url 'user_management:dashboard' %}">
-
-        {% if form.errors %}
-        <div class="alert alert-danger">
-            <p>Your username and password didn't match. Please try again.</p>
-        </div>
-        {% endif %}
-
-        <div class="form-group">
-            <label for="id_username">Username</label>
-            <input type="text" class="form-control" id="id_username" name="username" required>
+<section class="login-section">
+    <div class="login-container" data-aos="fade-up" data-aos-duration="1000">
+        <div class="login-header">
+            <h1>Welcome back</h1>
+            <p>Login to your SHELFY account</p>
         </div>
 
-        <div class="form-group">
-            <label for="id_password">Password</label>
-            <div class="password-wrapper">
-                <input type="password" class="form-control" id="id_password" name="password" required>
-                <button type="button" id="togglePassword" class="toggle-password">Show</button>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'user_management:dashboard' %}">
+
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span>Your username and password didn't match. Please try again.</span>
             </div>
-        </div>
+            {% endif %}
 
-        <button type="submit" class="btn btn-login">Login</button>
+            <div class="form-group">
+                <label for="id_username">
+                    <i class="fas fa-user me-2"></i>Username
+                </label>
+                <input type="text" class="form-control" id="id_username" name="username" required>
+            </div>
 
-        <p class="signup-text">Don't have an account? <a href="{% url 'user_management:register' %}">Sign up</a></p>
-    </form>
-</div>
+            <div class="form-group">
+                <label for="id_password">
+                    <i class="fas fa-lock me-2"></i>Password
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-control" id="id_password" name="password" required>
+                    <button type="button" id="togglePassword" class="toggle-password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="forgot-password">
+                <a href="{% url 'password_reset_form' %}">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+
+            <p class="signup-text">Don't have an account? <a href="{% url 'user_management:register' %}">Sign up</a></p>
+
+            <div class="social-login">
+                <div class="social-login-divider">
+                    <span>Or continue with</span>
+                </div>
+                <div class="social-login-buttons">
+                    <a href="#" class="social-btn google">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-btn apple">
+                        <i class="fab fa-apple"></i>
+                    </a>
+                    <a href="#" class="social-btn twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -149,15 +375,19 @@
         const togglePassword = document.getElementById("togglePassword");
 
         togglePassword.addEventListener("click", function () {
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                togglePassword.textContent = "Hide";
+            const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+            passwordField.setAttribute("type", type);
+            
+            // Toggle eye icon
+            const icon = togglePassword.querySelector("i");
+            if (type === "password") {
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
             } else {
-                passwordField.type = "password";
-                togglePassword.textContent = "Show";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
             }
         });
     });
 </script>
 {% endblock %}
-

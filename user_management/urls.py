@@ -9,4 +9,5 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('dashboard/', dashboard, name='dashboard'),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    
 ]

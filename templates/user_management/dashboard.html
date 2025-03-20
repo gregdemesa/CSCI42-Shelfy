@@ -1,13 +1,488 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard - SHELFY{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-lg p-4">
-        <h2 class="text-center">Welcome, {{ username }}!</h2>
-        <p><strong>Display Name:</strong> {{ profile.display_name }}</p>
-        <a href="{% url 'user_management:update_profile' %}" class="btn btn-primary">Edit Profile</a>
+<style>
+    .dashboard-header {
+        padding: 2rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-header p {
+        color: var(--gray);
+        font-size: 1.1rem;
+    }
+    
+    .dashboard-stats {
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        background-color: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        height: 100%;
+        transition: all 0.3s ease;
+        border-bottom: 4px solid transparent;
+    }
+    
+    .dark-mode .stat-card {
+        background-color: #16213e;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-bottom-color: var(--primary);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+        color: white;
+    }
+    
+    .stat-icon.books {
+        background-color: var(--primary);
+    }
+    
+    .stat-icon.games {
+        background-color: var(--secondary);
+    }
+    
+    .stat-icon.movies {
+        background-color: var(--accent);
+    }
+    
+    .stat-icon.collections {
+        background-color: var(--success);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+    }
+    
+    .dark-mode .stat-value {
+        color: var(--light);
+    }
+    
+    .stat-label {
+        color: var(--gray);
+        font-size: 1rem;
+    }
+    
+    .recent-activity {
+        margin-bottom: 3rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 0.5rem;
+    }
+    
+    .activity-card {
+        background-color: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .dark-mode .activity-card {
+        background-color: #16213e;
+    }
+    
+    .activity-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .activity-icon.added {
+        background-color: var(--success);
+    }
+    
+    .activity-icon.updated {
+        background-color: var(--primary);
+    }
+    
+    .activity-icon.completed {
+        background-color: var(--accent);
+    }
+    
+    .activity-content {
+        flex-grow: 1;
+    }
+    
+    .activity-title {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        color: var(--dark);
+    }
+    
+    .dark-mode .activity-title {
+        color: var(--light);
+    }
+    
+    .activity-time {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+    
+    .profile-section {
+        background-color: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .dark-mode .profile-section {
+        background-color: #16213e;
+    }
+    
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .profile-info h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        color: var(--dark);
+    }
+    
+    .dark-mode .profile-info h2 {
+        color: var(--light);
+    }
+    
+    .profile-info p {
+        color: var(--gray);
+        margin-bottom: 0;
+    }
+    
+    .profile-actions {
+        margin-top: 1rem;
+    }
+    
+    .recommendations {
+        margin-bottom: 3rem;
+    }
+    
+    .recommendation-card {
+        background-color: var(--white);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .dark-mode .recommendation-card {
+        background-color: #16213e;
+    }
+    
+    .recommendation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+    
+    .recommendation-img {
+        height: 180px;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray);
+        font-size: 3rem;
+    }
+    
+    .dark-mode .recommendation-img {
+        background-color: #1e2746;
+    }
+    
+    .recommendation-content {
+        padding: 1.5rem;
+    }
+    
+    .recommendation-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+    }
+    
+    .dark-mode .recommendation-title {
+        color: var(--light);
+    }
+    
+    .recommendation-category {
+        color: var(--primary);
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .recommendation-description {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .recommendation-rating {
+        color: var(--warning);
+        margin-bottom: 1rem;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .dashboard-header h1 {
+            font-size: 2rem;
+        }
+        
+        .stat-card {
+            margin-bottom: 1rem;
+        }
+        
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+<div class="dashboard-header" data-aos="fade-up">
+    <h1>Welcome, {{ username }}!</h1>
+    <p>Track your books, games, and movies all in one place</p>
+</div>
+
+<div class="profile-section" data-aos="fade-up" data-aos-delay="100">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-info">
+            <h2>{{ username }}</h2>
+            <p>{% if profile.display_name %}{{ profile.display_name }}{% else %}Set your display name{% endif %}</p>
+        </div>
+    </div>
+    <div class="profile-actions">
+        <a href="{% url 'user_management:update_profile' %}" class="btn btn-primary">
+            <i class="fas fa-user-edit me-2"></i>Edit Profile
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-stats">
+    <div class="section-title" data-aos="fade-up" data-aos-delay="200">
+        <i class="fas fa-chart-pie"></i> Your Collection Stats
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="stat-card">
+                <div class="stat-icon books">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Books</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="stat-card">
+                <div class="stat-icon games">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Games</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+            <div class="stat-card">
+                <div class="stat-icon movies">
+                    <i class="fas fa-film"></i>
+                </div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Movies</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="600">
+            <div class="stat-card">
+                <div class="stat-icon collections">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Collections</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="recent-activity">
+    <div class="section-title" data-aos="fade-up" data-aos-delay="700">
+        <i class="fas fa-history"></i> Recent Activity
+    </div>
+    
+    <div class="activity-card" data-aos="fade-up" data-aos-delay="800">
+        <div class="activity-icon added">
+            <i class="fas fa-plus"></i>
+        </div>
+        <div class="activity-content">
+            <div class="activity-title">Welcome to SHELFY!</div>
+            <div class="activity-time">Just now</div>
+        </div>
+    </div>
+    
+    <div class="activity-card" data-aos="fade-up" data-aos-delay="900">
+        <div class="activity-icon updated">
+            <i class="fas fa-user-edit"></i>
+        </div>
+        <div class="activity-content">
+            <div class="activity-title">Account created</div>
+            <div class="activity-time">Just now</div>
+        </div>
+    </div>
+</div>
+
+<div class="recommendations">
+    <div class="section-title" data-aos="fade-up" data-aos-delay="1000">
+        <i class="fas fa-lightbulb"></i> Recommended for You
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="1100">
+            <div class="recommendation-card">
+                <div class="recommendation-img">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="recommendation-content">
+                    <div class="recommendation-category">Book</div>
+                    <div class="recommendation-title">The Midnight Library</div>
+                    <div class="recommendation-description">Between life and death there is a library, and within that library, the shelves go on forever.</div>
+                    <div class="recommendation-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary">Add to Collection</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="1200">
+            <div class="recommendation-card">
+                <div class="recommendation-img">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="recommendation-content">
+                    <div class="recommendation-category">Game</div>
+                    <div class="recommendation-title">Hollow Knight</div>
+                    <div class="recommendation-description">Forge your own path in this atmospheric action-adventure through a vast ruined kingdom.</div>
+                    <div class="recommendation-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary">Add to Collection</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="1300">
+            <div class="recommendation-card">
+                <div class="recommendation-img">
+                    <i class="fas fa-film"></i>
+                </div>
+                <div class="recommendation-content">
+                    <div class="recommendation-category">Movie</div>
+                    <div class="recommendation-title">Everything Everywhere All at Once</div>
+                    <div class="recommendation-description">An aging Chinese immigrant is swept up in an insane adventure.</div>
+                    <div class="recommendation-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary">Add to Collection</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="get-started text-center mt-5 mb-5" data-aos="fade-up" data-aos-delay="1400">
+    <h2 class="mb-4">Ready to build your collection?</h2>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="#" class="btn btn-primary">
+            <i class="fas fa-book me-2"></i>Add Books
+        </a>
+        <a href="#" class="btn btn-secondary">
+            <i class="fas fa-gamepad me-2"></i>Add Games
+        </a>
+        <a href="#" class="btn btn-info text-white">
+            <i class="fas fa-film me-2"></i>Add Movies
+        </a>
     </div>
 </div>
 {% endblock %}
