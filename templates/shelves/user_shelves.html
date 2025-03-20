@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Your Shelves</h1>
+
+    {% if shelves %}
+        <ul>
+            {% for shelf in shelves %}
+                <li>
+                    <strong>{{ shelf.name }}</strong> 
+                    {% if shelf.is_public %}
+                        (Public)
+                    {% else %}
+                        (Private)
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You don't have any shelves yet.</p>
+    {% endif %}
+{% endblock %}

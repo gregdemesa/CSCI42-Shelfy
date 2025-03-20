@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'shelfy',
     'user_management',
     'user_library',
+    'shelves',
 ]
 
 MIDDLEWARE = [
