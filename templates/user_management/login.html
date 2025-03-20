@@ -114,20 +114,25 @@
         <p>Login to your SHELFY account</p>
     </div>
 
-    <form method="POST" action="{% url 'login' %}?next={% url 'user_management:dashboard' %}">
+    <form method="POST">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'user_management:dashboard' %}">
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Your username and password didn't match. Please try again.</p>
+        </div>
+        {% endif %}
 
         <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
+            <label for="id_username">Username</label>
+            <input type="text" class="form-control" id="id_username" name="username" required>
         </div>
 
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="id_password">Password</label>
             <div class="password-wrapper">
-                <input type="password" class="form-control" id="password" name="password" required
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                    title="Password must be at least 8 characters long and include an uppercase letter, lowercase letter, a number, and a special character.">
+                <input type="password" class="form-control" id="id_password" name="password" required>
                 <button type="button" id="togglePassword" class="toggle-password">Show</button>
             </div>
         </div>
@@ -140,7 +145,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const passwordField = document.getElementById("password");
+        const passwordField = document.getElementById("id_password");
         const togglePassword = document.getElementById("togglePassword");
 
         togglePassword.addEventListener("click", function () {
@@ -152,11 +157,7 @@
                 togglePassword.textContent = "Show";
             }
         });
-
-        passwordField.addEventListener('input', function () {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-            this.setCustomValidity(regex.test(this.value) ? '' : 'Password must be at least 8 characters long and include an uppercase letter, lowercase letter, a number, and a special character.');
-        });
     });
 </script>
 {% endblock %}
+

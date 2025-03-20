@@ -101,15 +101,45 @@
     .login-text a:hover {
         text-decoration: underline;
     }
+    
+    .alert {
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+    
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
 </style>
 
 <div class="register-container">
     <div class="register-header">
         <h1>Create an Account</h1>
     </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <form method="POST" action="{% url 'user_management:register' %}">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'user_management:dashboard' %}">
 
         <div class="form-group">
             <label for="username">Username</label>
@@ -187,6 +217,18 @@
         passwordField.addEventListener('input', function () {
             const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
             this.setCustomValidity(regex.test(this.value) ? '' : 'Password must be at least 8 characters long and include an uppercase letter, lowercase letter, a number, and a special character.');
+        });
+
+        // Form submission validation
+        document.querySelector("form").addEventListener("submit", function(e) {
+            if (passwordField.value !== confirmPasswordField.value) {
+                e.preventDefault();
+                alert("Passwords do not match!");
+                return false;
+            }
+            
+            // Form will be submitted if passwords match
+            return true;
         });
     });
 </script>
