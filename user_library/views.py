@@ -19,6 +19,11 @@ class LibraryIndexView(LoginRequiredMixin, ListView):
     template_name = "user_library/index.html"
     context_object_name = "library"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["star_range"] = range(5)
+        return context
+
     def get_queryset(self):
         return UserLibraryItem.objects.filter(user=self.request.user)
 

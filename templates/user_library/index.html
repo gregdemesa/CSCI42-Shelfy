@@ -6,17 +6,22 @@
     {% if library %}
         <div class="row">
             {% for entry in library %}
-                <div class="col-md-3 mb-4">
-                    <div class="card shadow-sm border-0 rounded h-100">
-                       
-                            <img src="{{ entry.media.cover_image }}" class="card-img-top rounded-top" alt="{{ entry.media.title }}">
-
-                    
-                        <div class="card-body d-flex flex-column align-items-center text-center">
-                            <h6 class="card-title fw-bold mb-3" style="margin-bottom:16px;">{{ entry.media.title }}</h6>
-                            <span style="color: gray; display: block; font-size: 0.9em; margin-top: -16px;">{% if entry.media.media_type == "book" %} Book {% elif entry.media.media_type == "movie" %} Movie {% elif entry.media.media_type == "game" %} Game {%endif%}</span>
-                            <!-- inline status edit dropdown -->
-                            <form class="status-form mb-3 w-100" data-item-id="{{ entry.id }}">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3 d-flex justify-content-center">
+                    <div class="library-card">
+                        <a href="{% url 'media_detail' media_type=entry.media.media_type external_id=entry.media.external_id %}" class="text-decoration-none">
+                            <div class="cover-container">
+                                <img src="{{ entry.media.cover_image }}" alt="{{ entry.media.title }}">
+                            </div>
+                        </a>
+                
+                        <div class="card-body">
+                            <h6 class="media-title">{{ entry.media.title }}</h6>
+                            <span class="media-type">
+                                {% if entry.media.media_type == "book" %} Book {% elif entry.media.media_type == "movie" %} Movie {% elif entry.media.media_type == "game" %} Game {% endif %}
+                            </span>
+                
+                            <!-- Status Dropdown -->
+                            <form class="status-form" data-item-id="{{ entry.id }}">
                                 {% csrf_token %}
                                 <select class="form-select status-dropdown">
                                     {% for value, label in entry.STATUS_CHOICES %}
@@ -25,26 +30,31 @@
                                         </option>
                                     {% endfor %}
                                 </select>
-                            </form>                        
-
-                            <!-- show rating only for completed or dropped -->
-                            {% if entry.status == "completed" or entry.status == "dropped" %}
-                                <div class="small">
-                                    {% with rating=entry.rating|default:0|floatformat:0 %}
-                                        {% for i in "12345" %}
-                                            {% if forloop.counter <= rating|add:0 %}
-                                                ★
-                                            {% else %}
-                                                ☆
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endwith %}
+                            </form>
+                
+                            <div class="bottom-content">
+                                <!-- Rating -->
+                                <div class="rating-container">
+                                    {% if entry.status == "completed" or entry.status == "dropped" %}
+                                        {% if entry.rating and entry.rating > 0 %}
+                                            <div class="stars">
+                                                {% for i in star_range %}
+                                                    {% if i < entry.rating %}
+                                                        <span class="star filled">★</span>
+                                                    {% else %}
+                                                        <span class="star empty">☆</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="no-rating">Not Yet Rated</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="no-rating">Not Yet Rated</span>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
-
-                            <!-- buttons -->
-                            <div class="mt-auto w-100">
-                                <div class="d-flex justify-content-center gap-3">
+                
+                                <div class="buttons">
                                     <a href="{% url 'user_library:edit' entry.get_hashed_id %}" class="btn btn-outline-primary btn-sm">Edit</a>
                                     <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-item-id="{{ entry.id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                         Delete
@@ -53,7 +63,7 @@
                             </div>
                         </div>
                     </div>
-                </div>                
+                </div>                                                           
             {% endfor %}
         </div>
     {% else %}
@@ -61,6 +71,7 @@
     {% endif %}
 </div>
 
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -102,7 +113,6 @@
                 if (data.success) {
                     console.log("Status updated successfully!");
                     
-                    // update UI instantly
                     let entryCard = form.closest(".card-body");
                     let ratingField = entryCard.querySelector(".rating-field");
 
@@ -112,7 +122,6 @@
                         ratingField.style.display = "none";
                     }
 
-                    // refresh CSRF token if changed
                     if (data.csrf_token) {
                         let csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
                         if (csrfInput) csrfInput.value = data.csrf_token;
@@ -140,7 +149,7 @@
                 headers: { "X-CSRFToken": "{{ csrf_token }}" }
             }).then(response => {
                 if (response.ok) {
-                    document.querySelector(`[data-item-id="${deleteItemId}"]`).closest('.col-md-3, .card.shadow-sm').remove();
+                    document.querySelector(`[data-item-id="${deleteItemId}"]`).closest('.col-md-3, .library-card').remove();
                     deleteItemId = null;
                     let modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                     modal.hide();
