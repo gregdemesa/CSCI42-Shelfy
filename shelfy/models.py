@@ -1,4 +1,5 @@
 from django.db import models
+from user_management.models import Profile
 
 class Media(models.Model):
     MEDIA_TYPES = [
@@ -22,3 +23,16 @@ class Media(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.media_type})"
+    
+class Comment(models.Model):
+    comment_author = models.ForeignKey(Profile, null = True,on_delete= models.SET_NULL, related_name = "media_comment_author" )
+    media = models.ForeignKey(Media, on_delete = models.CASCADE)
+    entry = models.TextField()
+    created_on = models.DateTimeField(auto_now_add = True)
+    updated_on = models.DateTimeField(auto_now = True) #https://www.scaler.com/topics/django/django-datetimefield/ \        
+    
+    def __str__(self):
+        return self.entry
+    
+    class Meta:
+        ordering = ['-created_on'] 

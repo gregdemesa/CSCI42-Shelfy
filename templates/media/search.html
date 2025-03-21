@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-light">Search Results for "{{ query }}"</h2>
+
+    {% if search_results %}
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 mt-3">
+        {% for media in search_results %}
+        <div class="col">
+            <div class="card bg-dark text-light shadow-sm h-100">
+                <a href="{% url 'media_detail' media_type=media.media_type external_id=media.external_id %}" class="text-decoration-none">
+                    <img src="{{ media.cover_image }}" class="card-img-top" alt="{{ media.title }}" style="height: 250px; object-fit: cover;">
+                </a>
+                <div class="card-body text-center">
+                    <h6 class="card-title">{{ media.title }}</h6>
+                    <p class="card-text"><small>{{ media.release_year }}</small></p>
+                    
+                    <!-- add to library form -->
+                    <form method="POST" action="{% url 'user_library:add' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="media_type" value="{{ media.media_type }}">
+                        <input type="hidden" name="external_id" value="{{ media.external_id }}">
+                        <button type="submit" class="btn btn-sm btn-primary">Add to Library</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-light mt-3">No results found.</p>
+    {% endif %}
+</div>
+{% endblock %}
