@@ -550,12 +550,16 @@
                             <i class="fas fa-film me-1"></i> Movies
                         </a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/library">
+                          <i class="fas fa-film me-1"></i> My Library
+                      </a>
+                  </li>
                 </ul>
                 
                 <!-- Search Form -->
                 <form class="d-flex" action="{% url 'media_search' %}" method="get">
                     <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-dark" type="submit">Search</button>
                 </form>
                 
                 <!-- Right Side: Auth & Dark Mode -->
