@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Your Library</h2>
+    {% if library %}
+        <div class="row">
+            {% for entry in library %}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3 d-flex justify-content-center">
+                    <div class="library-card">
+                        <a href="{% url 'media_detail' media_type=entry.media.media_type external_id=entry.media.external_id %}" class="text-decoration-none">
+                            <div class="cover-container">
+                                <img src="{{ entry.media.cover_image }}" alt="{{ entry.media.title }}">
+                            </div>
+                        </a>
+                
+                        <div class="card-body">
+                            <h6 class="media-title">{{ entry.media.title }}</h6>
+                            <span class="media-type">
+                                {% if entry.media.media_type == "book" %} Book {% elif entry.media.media_type == "movie" %} Movie {% elif entry.media.media_type == "game" %} Game {% endif %}
+                            </span>
+                
+                            <!-- Status Dropdown -->
+                            <form class="status-form" data-item-id="{{ entry.id }}">
+                                {% csrf_token %}
+                                <select class="form-select status-dropdown">
+                                    {% for value, label in entry.STATUS_CHOICES %}
+                                        <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                
+                            <div class="bottom-content">
+                                <!-- Rating -->
+                                <div class="rating-container">
+                                    {% if entry.status == "completed" or entry.status == "dropped" %}
+                                        {% if entry.rating and entry.rating > 0 %}
+                                            <div class="stars">
+                                                {% for i in star_range %}
+                                                    {% if i < entry.rating %}
+                                                        <span class="star filled">★</span>
+                                                    {% else %}
+                                                        <span class="star empty">☆</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="no-rating">Not Yet Rated</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="no-rating">Not Yet Rated</span>
+                                    {% endif %}
+                                </div>
+                
+                                <div class="buttons">
+                                    <a href="{% url 'user_library:edit' entry.get_hashed_id %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-item-id="{{ entry.id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                                                           
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Looks like your library is feeling a bit lonely. Time to add some awesome media!</p>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Once you delete this, there's no going back. You sure you wanna do this?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.status-form').forEach(form => {
+        form.addEventListener('change', function (event) {
+            event.preventDefault();
+
+            let itemId = this.getAttribute('data-item-id');
+            let statusDropdown = this.querySelector('.status-dropdown');
+            let newStatus = statusDropdown.value;
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+            fetch(`/library/update/${itemId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Status updated successfully!");
+                    
+                    let entryCard = form.closest(".card-body");
+                    let ratingField = entryCard.querySelector(".rating-field");
+
+                    if (newStatus === "completed" || newStatus === "dropped") {
+                        ratingField.style.display = "block";
+                    } else {
+                        ratingField.style.display = "none";
+                    }
+
+                    if (data.csrf_token) {
+                        let csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+                        if (csrfInput) csrfInput.value = data.csrf_token;
+                    }
+                } else {
+                    alert("Yikes! That status change didn’t stick. Maybe try again with a little more determination?");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+    
+    let deleteItemId = null;
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            deleteItemId = this.getAttribute('data-item-id');
+        });
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        if (deleteItemId) {
+            fetch(`/library/delete/${deleteItemId}/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}" }
+            }).then(response => {
+                if (response.ok) {
+                    document.querySelector(`[data-item-id="${deleteItemId}"]`).closest('.col-md-3, .library-card').remove();
+                    deleteItemId = null;
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                    modal.hide();
+                } else {
+                    alert("Uh-oh! The delete button must be on strike. Try again in a bit.");
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
