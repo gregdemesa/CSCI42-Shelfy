@@ -8,8 +8,10 @@
             {% for entry in library %}
                 <div class="col-md-3 mb-4">
                     <div class="card shadow-sm border-0 rounded h-100">
-                        <img src="{{ entry.media.cover_image }}" class="card-img-top rounded-top" alt="{{ entry.media.title }}">
-                
+                        <a  href = "{% url 'media_detail' media_type=entry.media.media_type external_id=entry.media.external_id %}">
+                            <img src="{{ entry.media.cover_image }}" class="card-img-top rounded-top" alt="{{ entry.media.title }}">
+                        </a>
+                    
                         <div class="card-body d-flex flex-column align-items-center text-center">
                             <h6 class="card-title fw-bold mb-3">{{ entry.media.title }}</h6>
 
