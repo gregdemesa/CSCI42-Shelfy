@@ -60,15 +60,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    << << << << < Temporary merge branch 1
     'user_management',
     'user_library',
     'shelfy',
-    == == == == =
     'user_library',
     'shelfy',
     'user_management',
-    >>>>>>>> > Temporary merge branch 2
 ]
 
 MIDDLEWARE = [
