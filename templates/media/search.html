@@ -57,9 +57,6 @@
 
                     feedbackDiv.textContent = data.message;
 
-                    if (data.success) {
-                        form.querySelector("button").disabled = true;
-                    }
                         setTimeout(() => {
                         feedbackDiv.style.display = "none";
                     }, 3000);

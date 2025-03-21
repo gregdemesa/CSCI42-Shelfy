@@ -94,10 +94,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 feedbackDiv.textContent = body.message;
 
-                if (status === 200) {
-                    form.querySelector("button").disabled = true;
-                }
-
                 setTimeout(() => {
                     feedbackDiv.style.display = "none";
                 }, 3000);
