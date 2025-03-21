@@ -28,7 +28,6 @@ class AddToLibraryView(LoginRequiredMixin, View):
         media_type = request.POST.get("media_type")
         external_id = request.POST.get("external_id")
 
-        # try to get the media from the database
         media, created = Media.objects.get_or_create(
             external_id=external_id,
             media_type=media_type,
@@ -36,13 +35,11 @@ class AddToLibraryView(LoginRequiredMixin, View):
         )
 
         # check if media is already in user library
-        if not UserLibraryItem.objects.filter(user=request.user, media=media).exists():
-            UserLibraryItem.objects.create(user=request.user, media=media, status="planned")
-            messages.success(request, f"{media.title} has been added to your library!")
-        else:
-            messages.info(request, f"{media.title} is already in your library.")
+        if UserLibraryItem.objects.filter(user=request.user, media=media).exists():
+            return JsonResponse({"success": False, "message": f"{media.title} is already in your library."}, status=400)
 
-        return redirect("user_library:index")  # redirect to library index
+        UserLibraryItem.objects.create(user=request.user, media=media, status="planned")
+        return JsonResponse({"success": True, "message": f"{media.title} has been added to your library!"})
     
     def fetch_and_format_media(self, media_type, external_id):
         media_data = MediaAPIClient.get_media_details(media_type, external_id)
