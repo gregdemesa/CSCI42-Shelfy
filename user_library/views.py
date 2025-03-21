@@ -34,7 +34,6 @@ class AddToLibraryView(LoginRequiredMixin, View):
             defaults=self.fetch_and_format_media(media_type, external_id),
         )
 
-        # check if media is already in user library
         if UserLibraryItem.objects.filter(user=request.user, media=media).exists():
             return JsonResponse({"success": False, "message": f"{media.title} is already in your library."}, status=400)
 
