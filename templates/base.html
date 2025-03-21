@@ -690,6 +690,18 @@
                 margin-bottom: 0.5rem;
             }
         }
+
+        .navbar-icon {
+            font-size: 1.4rem;
+            margin-right: 0.2rem;
+        }
+
+        @media (max-width: 992px) {
+            .navbar-custom form {
+                width: 100% !important;
+                margin: 0.5rem 0;
+            }
+        }
     </style>
 </head>
 <body style="background-image: linear-gradient(to right, #8fb4ff, #fff4ab);">
@@ -709,37 +721,37 @@
             <!-- Navbar Content -->
             <div class="collapse navbar-collapse" id="navbarContent">
                 <!-- Navigation Links -->
-                <ul class="navbar-nav mx-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'user_management:dashboard' %}">
-                            <i class="fas fa-home me-1"></i> Home
+                        <a class="nav-link active" href="/home">
+                            <i class="fas fa-home navbar-icon"></i> 
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="fas fa-book me-1"></i> Books
+                            <i class="fas fa-book navbar-icon"></i> 
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="fas fa-gamepad me-1"></i> Games
+                            <i class="fas fa-gamepad navbar-icon"></i>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="fas fa-film me-1"></i> Movies
+                            <i class="fas fa-film navbar-icon"></i>
                         </a>
                     </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="/library">
-                          <i class="fas fa-film me-1"></i> My Library
-                      </a>
-                  </li>
                 </ul>
                 
                 <!-- Search Form -->
-                <form class="d-flex" action="{% url 'media_search' %}" method="get">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                <form class="d-flex mx-auto" action="{% url 'media_search' %}" method="get" style="width: 40%;">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="q" placeholder="Search books, games, movies..." aria-label="Search">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </form>
                 
                 <!-- Right Side: Auth & Dark Mode -->
@@ -758,9 +770,28 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                                 <li>
                                     <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
-                                        <i class="fas fa-user-edit me-2"></i> Edit Profile
+                                        <i class="fas fa-user-edit me-2"></i> Dashboard
                                     </a>
                                 </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
+                                        <i class="fas fa-user-circle me-2"></i> Socials
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/library">
+                                        <i class="fas fa-folder-open me-2"></i> My Library
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="">
+                                        <i class="fas fa-bar-chart me-2"></i> Statistics
+                                    </a>
+                                </li>
+
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{% url 'logout' %}">
