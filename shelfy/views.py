@@ -25,9 +25,25 @@ class MediaDetailView(View):
         if not details:
             return JsonResponse({"error": "Media not found"}, status=404)
         
+        media, created = Media.objects.get_or_create(
+            external_id=external_id,
+            media_type=media_type,
+            defaults={
+                "title": details["title"],
+                "description": details["description"],
+                "cover_image": details["cover_image"],
+                "release_year": details.get("release_year", None),
+                "genre": details.get("genre", ""),
+                "author": details.get("author", ""),
+            }
+        )
+        
         comments = Comment.objects.all()
-
-        return render(request, "media/media_detail.html", {"media": details, "media_type": media_type, "comments": comments, "external_id": external_id})
+    
+        return render(request, "media/media_detail.html", {
+            "media": media,
+            "comments": comments,
+        })
     
     def post(self, request, media_type, external_id): 
         details = MediaAPIClient.get_media_details(media_type, external_id)

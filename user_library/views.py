@@ -35,16 +35,16 @@ class AddToLibraryView(LoginRequiredMixin, View):
         )
 
         if UserLibraryItem.objects.filter(user=request.user, media=media).exists():
-            return JsonResponse({"success": False, "message": f"{media.title} is already in your library."}, status=400)
+            return JsonResponse({"success": False, "message": "Slow down, collector! This one's already in your library."}, status=400)
 
         UserLibraryItem.objects.create(user=request.user, media=media, status="planned")
-        return JsonResponse({"success": True, "message": f"{media.title} has been added to your library!"})
+        return JsonResponse({"success": True, "message": "Nice pick! It’s now in your library."})
     
     def fetch_and_format_media(self, media_type, external_id):
         media_data = MediaAPIClient.get_media_details(media_type, external_id)
         
         if "error" in media_data:
-            messages.error(self.request, "Failed to retrieve media details from API.")
+            messages.error(self.request, "Uh-oh! Our media scouts couldn't retrieve the details. Try again later?")
             return {}
 
         formatted_data = {
@@ -77,7 +77,7 @@ class EditLibraryItemView(LoginRequiredMixin, UpdateView):
         if id_tuple:
             return get_object_or_404(UserLibraryItem, id=id_tuple[0])
         else:
-            raise Http404("Item not found")
+            raise Http404("Hmm… this library entry seems to be lost in the void. Are you sure it exists?")
     
     def get_success_url(self):
         return reverse("user_library:index")
@@ -99,12 +99,12 @@ class UpdateLibraryStatusView(LoginRequiredMixin, View):
                 "new_status": item.get_status_display(),
                 "csrf_token": get_token(request)
             })
-        return JsonResponse({"success": False, "error": "Invalid status"}, status=400)
+        return JsonResponse({"success": False, "error": "Hmm… that status doesn't exist in this universe. Try again with a valid one!"}, status=400)
 
     
 class DeleteLibraryItemView(LoginRequiredMixin, View):
     def post(self, request, item_id, *args, **kwargs):
         entry = get_object_or_404(UserLibraryItem, id=item_id, user=request.user)
         entry.delete()
-        messages.success(request, "Media removed from your library.")
+        messages.success(request, "Poof! Gone from your library.")
         return redirect("user_library:index")

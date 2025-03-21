@@ -57,7 +57,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p>You haven't added any media to your library yet.</p>
+        <p>Looks like your library is feeling a bit lonely. Time to add some awesome media!</p>
     {% endif %}
 </div>
 
@@ -69,7 +69,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this entry? This action cannot be undone.
+                Once you delete this, there's no going back. You sure you wanna do this?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -118,7 +118,7 @@
                         if (csrfInput) csrfInput.value = data.csrf_token;
                     }
                 } else {
-                    alert("Failed to update status.");
+                    alert("Yikes! That status change didn’t stick. Maybe try again with a little more determination?");
                 }
             })
             .catch(error => console.error("Error:", error));
@@ -145,7 +145,7 @@
                     let modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                     modal.hide();
                 } else {
-                    alert("Failed to delete.");
+                    alert("Uh-oh! The delete button must be on strike. Try again in a bit.");
                 }
             });
         }
