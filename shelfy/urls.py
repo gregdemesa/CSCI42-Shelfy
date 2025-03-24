@@ -30,7 +30,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name="user_management/login.html"), name="login"),
     path('logout/', auth_views.LogoutView.as_view(), name="logout"),
     path('statistics/', include('charts.urls', namespace='statistics')),
-]
+    
     # Password reset URLs
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='user_management/password_reset/password_reset_form.html'), 
