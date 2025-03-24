@@ -30,6 +30,20 @@ GOOGLE_BOOKS_API_KEY = os.getenv('GOOGLE_BOOKS_API_KEY')
 TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 RAWG_API_KEY = os.getenv('RAWG_API_KEY')
 
+# CSRF Settings
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Set to True in production
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Session Settings
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# Security Settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,10 +62,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'shelfy',
-    'user_management',
-    'charts',
     'user_library',
+    'shelfy',
+    'user_management'
 ]
 
 MIDDLEWARE = [
@@ -105,6 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -115,12 +129,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Manila'
 
 USE_I18N = True
 
@@ -133,8 +148,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 LOGIN_URL = "/login"
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/user/dashboard'
+LOGOUT_REDIRECT_URL = '/login'
+LOGIN_REDIRECT_URL = 'user_management:dashboard'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
