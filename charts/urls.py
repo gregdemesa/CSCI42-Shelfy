@@ -1,11 +1,8 @@
-from django.urls import path 
-from .views import HomeView, ChartData
-  
-app_name = 'statistics'
+from django.urls import path
+from .views import AverageRatingView
 
-urlpatterns = [ 
-    # path('admin/', admin.site.urls), 
-    path('statistics/', HomeView.as_view(), name="statistics_home"), 
-    # path('test-api', views.get_data), 
-    # path('statistics/chart', ChartData.as_view(), name="statistics"), 
-] 
+app_name = 'charts'
+
+urlpatterns = [
+    path('average-rating', AverageRatingView.as_view(), name='charts'),
+]
