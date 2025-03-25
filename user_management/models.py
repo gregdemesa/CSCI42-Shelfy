@@ -8,6 +8,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+
 # # signal to automatically create a Profile when a User is created
 # @receiver(post_save, sender=User)
 # def create_user_profile(sender, instance, created, **kwargs):

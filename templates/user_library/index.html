@@ -1,163 +1,397 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Your Library</h2>
-    {% if library %}
-        <div class="row">
-            {% for entry in library %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3 d-flex justify-content-center">
-                    <div class="library-card">
-                        <a href="{% url 'media_detail' media_type=entry.media.media_type external_id=entry.media.external_id %}" class="text-decoration-none">
-                            <div class="cover-container">
-                                <img src="{{ entry.media.cover_image }}" alt="{{ entry.media.title }}">
-                            </div>
-                        </a>
-                
-                        <div class="card-body">
-                            <h6 class="media-title">{{ entry.media.title }}</h6>
-                            <span class="media-type">
-                                {% if entry.media.media_type == "book" %} Book {% elif entry.media.media_type == "movie" %} Movie {% elif entry.media.media_type == "game" %} Game {% endif %}
-                            </span>
-                
-                            <!-- Status Dropdown -->
-                            <form class="status-form" data-item-id="{{ entry.id }}">
-                                {% csrf_token %}
-                                <select class="form-select status-dropdown">
-                                    {% for value, label in entry.STATUS_CHOICES %}
-                                        <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </form>
-                
-                            <div class="bottom-content">
-                                <!-- Rating -->
-                                <div class="rating-container">
-                                    {% if entry.status == "completed" or entry.status == "dropped" %}
-                                        {% if entry.rating and entry.rating > 0 %}
-                                            <div class="stars">
-                                                {% for i in star_range %}
-                                                    {% if i < entry.rating %}
-                                                        <span class="star filled">★</span>
-                                                    {% else %}
-                                                        <span class="star empty">☆</span>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                        {% else %}
-                                            <span class="no-rating">Not Yet Rated</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="no-rating">Not Yet Rated</span>
-                                    {% endif %}
-                                </div>
-                
-                                <div class="buttons">
-                                    <a href="{% url 'user_library:edit' entry.get_hashed_id %}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-item-id="{{ entry.id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>                                                           
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>Looks like your library is feeling a bit lonely. Time to add some awesome media!</p>
-    {% endif %}
-</div>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .bookshelf-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .bookshelf {
+            height: 220px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 0 20px;
+        }
+        .books-wrapper {
+            display: flex;
+            gap: 4px;
+            transform: translateX(0px);
+            transition: transform 0.5s ease;
+        }
+        .book {
+            height: 220px;
+            display: flex;
+            flex-shrink: 0;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: width 0.5s ease;
+        }
+        .book:not(.selected) {
+            width: 41.5px;
+        }
+        .book.selected {
+            width: 207.5px; /* 41.5px (spine) + 166px (cover) */
+        }
+        .spine {
+            width: 41.5px;
+            height: 220px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            flex-shrink: 0;
+            transform-origin: right;
+            transition: transform 0.5s ease;
+            transform-style: preserve-3d;
+            position: relative;
+            z-index: 2;
+            filter: brightness(0.8) contrast(2);
+        }
+        .book:not(.selected) .spine {
+            transform: rotateY(0deg);
+        }
+        .book.selected .spine {
+            transform: rotateY(-60deg);
+        }
+        .spine-content {
+            writing-mode: vertical-rl;
+            padding-top: 12px;
+            font-weight: bold;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 196px;
+            user-select: none;
+        }
+        .cover {
+            width: 166px;
+            height: 220px;
+            transform-origin: left;
+            transition: transform 0.5s ease;
+            transform-style: preserve-3d;
+            overflow: hidden;
+            position: relative;
+            filter: brightness(0.8) contrast(2);
+        }
+        .book:not(.selected) .cover {
+            transform: rotateY(88.8deg);
+        }
+        .book.selected .cover {
+            transform: rotateY(30deg);
+        }
+        .cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+        .cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 2px, rgba(255, 255, 255, 0.5) 3px, rgba(255, 255, 255, 0.25) 4px, rgba(255, 255, 255, 0.25) 6px, transparent 7px, transparent 9px, rgba(255, 255, 255, 0.25) 9px, transparent 12px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .paper-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="8"/><feDiffuseLighting in="noise" lighting-color="white" surfaceScale="1"><feDistantLight azimuth="45" elevation="35"/></feDiffuseLighting></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .nav-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+        .nav-button.prev {
+            left: -36px;
+        }
+        .nav-button.next {
+            right: -36px;
+        }
+        .nav-button svg {
+            width: 12px;
+            height: 12px;
+        }
+        .book-details-card {
+            background-color: #f5f5dc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 40px auto 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 700px;
+            text-align: center;
+            min-height: 300px;
+        }
+        .book-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a202c;
+        }
+        .book-meta {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+        .book-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .status-form {
+            margin: 20px auto;
+            max-width: 300px;
+        }
+    </style>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="bookshelf-container">
+        <button class="nav-button prev">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
+            </svg>
+        </button>
+        
+        <div class="bookshelf">
+            <div class="books-wrapper">
+               {% for entry in library %}
+                  <div class="book"
+                       data-item-id="{{ entry.id }}"
+                       data-title="{{ entry.media.title }}"
+                       data-author="{{ entry.media.author }}"
+                       data-type="{{ entry.media.media_type }}"
+                       data-url="{% url 'media_detail' media_type=entry.media.media_type external_id=entry.media.external_id %}"
+                       data-edit-url="{% url 'user_library:edit' entry.get_hashed_id %}"
+                       data-status="{{ entry.status }}">
+                     <div class="spine" style="background-color: #000;">
+                           <div class="spine-content" style="color: #fff;">{{ entry.media.title }}</div>
+                           <div class="paper-texture"></div>
+                     </div>
+                     <div class="cover">
+                           <img src="{{ entry.media.cover_image }}" alt="{{ entry.media.title }}">
+                           <div class="paper-texture"></div>
+                     </div>
+                  </div>
+               {% endfor %}
             </div>
-            <div class="modal-body">
-                Once you delete this, there's no going back. You sure you wanna do this?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+        
+        <button class="nav-button next">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="book-details-card">
+        <h1 class="book-title">Nothing Selected</h1>
+        <div class="book-meta">Nothing Selected</div>
+        <div class="book-description">Select a book from the shelf to see details here.</div>
+        <!-- Status Dropdown, Edit, & Delete -->
+        <form class="status-form" data-item-id="">
+            {% csrf_token %}
+            <select class="form-select status-dropdown">
+              {% for value, label in status_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+        </form>
+        <div class="action-buttons">
+            <a href="#" class="btn btn-outline-primary btn-sm edit-btn">Edit</a>
+            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-item-id="" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Once you delete this, there's no going back. You sure you wanna do this?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.querySelectorAll('.status-form').forEach(form => {
-        form.addEventListener('change', function (event) {
-            event.preventDefault();
-
-            let itemId = this.getAttribute('data-item-id');
-            let statusDropdown = this.querySelector('.status-dropdown');
-            let newStatus = statusDropdown.value;
-            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-            fetch(`/library/update/${itemId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({ status: newStatus })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log("Status updated successfully!");
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const books = document.querySelectorAll('.book');
+            const booksWrapper = document.querySelector('.books-wrapper');
+            const prevButton = document.querySelector('.nav-button.prev');
+            const nextButton = document.querySelector('.nav-button.next');
+            const bookTitle = document.querySelector('.book-title');
+            const bookMeta = document.querySelector('.book-meta');
+            const bookDescription = document.querySelector('.book-description');
+            
+            let currentPosition = -200;
+            const bookWidth = 45.5; // spine width + gap
+            
+            books.forEach((book, index) => {
+                book.addEventListener('click', function() {
+                    // Deselect currently selected book
+                    const currentlySelected = document.querySelector('.book.selected');
+                    if (currentlySelected) {
+                        currentlySelected.classList.remove('selected');
+                    }
                     
-                    let entryCard = form.closest(".card-body");
-                    let ratingField = entryCard.querySelector(".rating-field");
-
-                    if (newStatus === "completed" || newStatus === "dropped") {
-                        ratingField.style.display = "block";
-                    } else {
-                        ratingField.style.display = "none";
-                    }
-
-                    if (data.csrf_token) {
-                        let csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
-                        if (csrfInput) csrfInput.value = data.csrf_token;
-                    }
-                } else {
-                    alert("Yikes! That status change didn’t stick. Maybe try again with a little more determination?");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        });
-    });
-    
-    let deleteItemId = null;
-
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            deleteItemId = this.getAttribute('data-item-id');
-        });
-    });
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-        if (deleteItemId) {
-            fetch(`/library/delete/${deleteItemId}/`, {
-                method: "POST",
-                headers: { "X-CSRFToken": "{{ csrf_token }}" }
-            }).then(response => {
-                if (response.ok) {
-                    document.querySelector(`[data-item-id="${deleteItemId}"]`).closest('.col-md-3, .library-card').remove();
-                    deleteItemId = null;
-                    let modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-                    modal.hide();
-                } else {
-                    alert("Uh-oh! The delete button must be on strike. Try again in a bit.");
-                }
+                    // Select this book
+                    this.classList.add('selected');
+                    
+                    // Center the selected book
+                    const bookIndex = Array.from(books).indexOf(this);
+                    const containerWidth = document.querySelector('.bookshelf').offsetWidth;
+                    const scrollAmount = (bookIndex * bookWidth) - (containerWidth / 2) + 100;
+                    booksWrapper.style.transform = `translateX(-${scrollAmount}px)`;
+                    
+                    // Update book details
+                    const title = this.dataset.title;
+                    const author = this.dataset.author;
+                    const type = this.dataset.type;
+                    const url = this.dataset.url;
+                    const editUrl = this.dataset.editUrl;
+                    const status = this.dataset.status;
+                    const itemId = this.dataset.itemId;
+                    
+                    bookTitle.textContent = title;
+                    bookMeta.innerHTML = `By: ${author} [<a href="${url}" class="type-link">${type}</a>]`;
+                    
+                    // Update the status form and action buttons in the details card
+                    const statusForm = document.querySelector('.book-details-card .status-form');
+                    statusForm.setAttribute('data-item-id', itemId);
+                    statusForm.querySelector('.status-dropdown').value = status;
+                    
+                    const editBtn = document.querySelector('.book-details-card .edit-btn');
+                    editBtn.setAttribute('href', editUrl);
+                    
+                    const deleteBtn = document.querySelector('.book-details-card .delete-btn');
+                    deleteBtn.setAttribute('data-item-id', itemId);
+                });
             });
-        }
-    });
-</script>
+            
+            prevButton.addEventListener('click', function() {
+                currentPosition = Math.max(currentPosition - 100, -200);
+                booksWrapper.style.transform = `translateX(${currentPosition}px)`;
+            });
+            
+            nextButton.addEventListener('click', function() {
+                currentPosition = Math.min(currentPosition + 100, 400);
+                booksWrapper.style.transform = `translateX(${currentPosition}px)`;
+            });
+        });
+        
+        // Status update functionality
+        document.querySelectorAll('.status-form').forEach(form => {
+            form.addEventListener('change', function (event) {
+                event.preventDefault();
+        
+                let itemId = this.getAttribute('data-item-id');
+                let statusDropdown = this.querySelector('.status-dropdown');
+                let newStatus = statusDropdown.value;
+                let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        
+                fetch(`/library/update/${itemId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ status: newStatus })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Status updated successfully!");
+                        if (data.csrf_token) {
+                            let csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+                            if (csrfInput) csrfInput.value = data.csrf_token;
+                        }
+                    } else {
+                        alert("Yikes! That status change didn’t stick. Maybe try again with a little more determination?");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+        
+        // Delete functionality
+        let deleteItemId = null;
+       
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                deleteItemId = this.getAttribute('data-item-id');
+            });
+        });
+       
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            if (deleteItemId) {
+                fetch(`/library/delete/${deleteItemId}/`, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": "{{ csrf_token }}" }
+                }).then(response => {
+                    if (response.ok) {
+                        // Remove the book element from the DOM
+                        document.querySelector(`[data-item-id="${deleteItemId}"]`).remove();
+                        deleteItemId = null;
+                        let modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                        modal.hide();
+                    } else {
+                        alert("Uh-oh! The delete button must be on strike. Try again in a bit.");
+                    }
+                });
+            }
+        });
+    </script>
+</html>
 {% endblock %}

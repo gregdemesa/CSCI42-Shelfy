@@ -22,11 +22,12 @@ class LibraryIndexView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["star_range"] = range(5)
+        context["status_choices"] = UserLibraryItem.STATUS_CHOICES
+        
         return context
 
     def get_queryset(self):
         return UserLibraryItem.objects.filter(user=self.request.user)
-
 
 class AddToLibraryView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):        
