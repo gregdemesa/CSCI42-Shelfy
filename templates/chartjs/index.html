@@ -14,9 +14,28 @@
 </head> 
 
 {% block content %}
-{% for ratings in rating %}
 
-{% endfor %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3">
+      <p class="text-center">Average Star Rating</p>
+      <p class="text-center">{{ rating }} ★</p>
+    </div>
+    <div class="col-sm">
+      <p class="text-center">Average Movie Star Rating</p>
+      <p class="text-center">{{ movie_rating }} ★</p>
+    </div>
+    <div class="col-sm">
+      <p class="text-center">Average Book Star Rating</p>
+      <p class="text-center">{{ book_rating }} ★</p>
+    </div>
+    <div class="col-sm">
+      <p class="text-center">Average Game Star Rating</p>
+      <p class="text-center">{{ game_rating }} ★</p>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
 
   

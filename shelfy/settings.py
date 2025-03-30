@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_library',
     'shelfy',
-    'user_management'
+    'user_management',
+    'charts'
 ]
 
 MIDDLEWARE = [
