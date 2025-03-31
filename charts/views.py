@@ -48,7 +48,14 @@ class MovieCountView(ListView):
     def get_context_data(self, **kwargs): # from Django Book/ Lecture
         context = super().get_context_data(**kwargs) #overides the other get_context
         movie_count = len(UserLibraryItem.objects.filter(media__media_type__iexact="movie"))
+        movie_rating = UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True)
+        movie_rating = list(filter(None, movie_rating))
+        max_movie_rating = max(UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True))
+        min_movie_rating = min(UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True))
         context['movie_count'] = movie_count
+        context['movie_rating'] = round(sum(movie_rating)/len(movie_rating),2)
+        context['max_movie_rating'] = max_movie_rating
+        context['min_movie_rating'] = min_movie_rating
     
         return context
     
@@ -91,3 +98,18 @@ def movies_chart(request):
         'movie': list(sorted_movie_counts),
     })
 
+def movies_ratings(request):
+    ratings_count = defaultdict(int)
+
+    movie_rating = UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True)
+
+    for rate in movie_rating:
+        ratings_count[rate]+=1
+    
+    rating = list(ratings_count.keys())
+    movie_counts = list(ratings_count.values())
+
+    return JsonResponse(data={
+        'rating': rating,
+        'movie': movie_counts
+    })
