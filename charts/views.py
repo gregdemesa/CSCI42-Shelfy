@@ -39,7 +39,17 @@ class AverageRatingView(ListView):
         context['movie_count'] = movie_count
         
         return context
-    
+
+def all_count(request):
+    movie_count = len(UserLibraryItem.objects.filter(media__media_type__iexact="movie"))
+    book_count = len(UserLibraryItem.objects.filter(media__media_type__iexact="book"))
+    game_count = len(UserLibraryItem.objects.filter(media__media_type__iexact="game"))
+
+    return JsonResponse(data={
+        'movie_count': movie_count,
+        'book_count': book_count,
+        'game_count': game_count
+    })   
 
 class MovieCountView(ListView):
     model = UserLibraryItem
@@ -59,9 +69,6 @@ class MovieCountView(ListView):
     
         return context
     
-    
-# def movie(request):
-#     return render(request,'chartjs/movies.html')
 
 def movies_chart(request):
     # Storing genre and corresponding number of movies with that genre
@@ -109,7 +116,67 @@ def movies_ratings(request):
     rating = list(ratings_count.keys())
     movie_counts = list(ratings_count.values())
 
+    ratings_movie_data = list(zip(rating, movie_counts))
+    
+    ratings_movie_data.sort(key=lambda x: x[0])
+
+    sorted_rating, sorted_rating_counts = zip(*ratings_movie_data)
+
     return JsonResponse(data={
-        'rating': rating,
-        'movie': movie_counts
+        'rating': sorted_rating,
+        'movie': sorted_rating_counts
+    })
+
+def movies_directors(request):
+    director_count = defaultdict(int)
+    
+    movie_directors = UserLibraryItem.objects.filter(media__media_type__iexact="movie")
+    
+    for entry in movie_directors:
+        # # Splitting the list of genres if a movie has more than one genre
+        # directors = entry.media.director.split(",")
+        
+        # # Increment the count for each genre
+        # for director in directors:
+        #     director_count[director.strip()] += 1  # Cleans whitespace between genres
+        director_count[entry.media.director] += 1
+
+    # Prepare the genre and movie count lists
+    directors = list(director_count.keys())
+    director_counts = list(director_count.values())
+
+    # Combine genre and movie count into a list of tuples
+    director_movie_data = list(zip(directors, director_counts))
+    
+    # Sort the list by movie counts in descending order
+    director_movie_data.sort(key=lambda x: x[1], reverse=True)
+
+    # Unzip the sorted data into separate lists again
+    sorted_directors, sorted_movie_counts = zip(*director_movie_data)
+
+    return JsonResponse(data={
+        'director': list(sorted_directors),
+        'movie': list(sorted_movie_counts),
+    })
+
+def movies_release_years(request):
+    release_year_count = defaultdict(int)
+    
+    release_years = UserLibraryItem.objects.filter(media__media_type__iexact="movie")
+    
+    for entry in release_years:
+        release_year_count[entry.media.release_year] += 1
+    
+    years = list(release_year_count.keys())
+    years_count = list(release_year_count.values())
+
+    release_year_movie_data = list(zip(years, years_count))
+    
+    release_year_movie_data.sort(key=lambda x: x[0])
+
+    sorted_years, sorted_years_counts = zip(*release_year_movie_data)
+
+    return JsonResponse(data={
+        'release_year': list(sorted_years),
+        'movie': list(sorted_years_counts),
     })

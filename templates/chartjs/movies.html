@@ -28,15 +28,6 @@
         <p class="text-center">Average Movie Rating</p>
         <p class="text-center">{{ movie_rating }} ★</p>
       </div>
-      <div class="col">
-        <p class="text-center">Highest Rated Movie</p>
-        <!-- change to name of movie? -->
-        <p class="text-center">{{ max_movie_rating }} ★</p> 
-      </div>
-      <div class="col">
-        <p class="text-center">Lowest Rated Movie</p>
-        <p class="text-center">{{ min_movie_rating }} ★</p>
-      </div>
     </div>
     
     <div class="row">
@@ -53,8 +44,16 @@
       
     </div>
     <div class="row">
-      
-      
+      <div class="col">
+        <div id="container" style="width: 100%;">
+          <canvas id="movies_directors" data-url="{% url 'charts:movies_directors' %}"></canvas>
+        </div>
+      </div>
+      <div class="col">
+        <div id="container" style="width: 100%;">
+          <canvas id="movies_release" data-url="{% url 'charts:movies_release' %}"></canvas>
+        </div>
+      </div>
     </div>
     
   </div>
@@ -91,16 +90,18 @@
 
             // Initialize the chart
             var movieChart = new Chart(ctx, {
-              type: 'bar',
+              type: 'horizontalBar',
               data: {
                 labels: data.genre,
                 datasets: [{
+                  axis: 'y',
                   label: 'Movies',
                   backgroundColor: 'blue',
                   data: data.movie
                 }]
               },
               options: {
+                indexAxis: 'y',
                 responsive: true,
                 legend: {
                   position: 'top',
@@ -110,9 +111,10 @@
                   text: 'Movie Genres'
                 },
                 scales: {
-                  yAxes: [{
+                  xAxes: [{
                       ticks: {
-                          beginAtZero: true
+                          beginAtZero: true,
+                          precision: 0
                       }
                   }]
                 }
@@ -172,10 +174,133 @@
                 scales: {
                   yAxes: [{
                       ticks: {
-                          beginAtZero: true
+                          beginAtZero: true,
+                          precision: 0
                       }
                   }]
                 }
+              }
+            });
+          } else {
+            console.error('Invalid data format:', data);
+          }
+        },
+        error: function (err) {
+          console.error("Error fetching data", err);
+        }
+      });
+    });
+
+    // directors chart
+    const directors = document.getElementById('movies_directors');
+    $(function () {
+    var $movies_directors = $("#movies_directors");
+
+    console.log("Canvas found:", $movies_directors[0]);
+    
+    $.ajax({
+        url: $movies_directors.data("url"),
+        success: function (data) {
+          console.log('AJAX data:', data);  // Debug: Check if data is correct
+
+          // Check if data exists and is in the expected format
+          if (data && Array.isArray(data.director) && Array.isArray(data.movie)) {
+            var director = $movies_directors[0].getContext("2d");
+
+            // Log to ensure that the context is set up correctly
+            console.log('Canvas context:', director);
+            console.log('Canvas element:', $movies_directors[0]);
+
+            // Initialize the chart
+            new Chart(director, {
+              type: 'bar',
+              data: {
+                labels: data.directors,
+                datasets: [{
+                  label: 'Movies',
+                  backgroundColor: 'blue',
+                  data: data.movie
+                }]
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true,
+                legend: {
+                  position: 'top',
+                },
+                title: {
+                  display: true,
+                  text: 'Movie Directors'
+                },
+                scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: true,
+                          precision: 0
+                      }
+                  }]
+                },
+              }
+            });
+          } else {
+            console.error('Invalid data format:', data);
+          }
+        },
+        error: function (err) {
+          console.error("Error fetching data", err);
+        }
+      });
+    });
+
+    // scatter chart for release year
+    const release_year = document.getElementById('movies_release');
+    $(function () {
+    var $movies_release = $("#movies_release");
+
+    console.log("Canvas found:", $movies_release[0]);
+    
+    $.ajax({
+        url: $movies_release.data("url"),
+        success: function (data) {
+          console.log('AJAX data:', data);  // Debug: Check if data is correct
+
+          // Check if data exists and is in the expected format
+          if (data && Array.isArray(data.release_year) && Array.isArray(data.movie)) {
+            var release_year = $movies_release[0].getContext("2d");
+
+            // Log to ensure that the context is set up correctly
+            console.log('Canvas context:', release_year);
+            console.log('Canvas element:', $movies_release[0]);
+
+            // Initialize the chart
+            new Chart(release_year, {
+              type: 'bar',
+              data: {
+                labels: data.release_year,
+                datasets: [{
+                  label: 'Movies',
+                  backgroundColor: 'blue',
+                  data: data.movie
+                }]
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true,
+                legend: {
+                  position: 'top',
+                },
+                title: {
+                  display: true,
+                  text: 'Movie Release Years'
+                },
+                scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: true,
+                          precision: 0
+                      }
+                  }]
+                },
               }
             });
           } else {
