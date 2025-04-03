@@ -7,6 +7,7 @@ app_name = 'charts'
 urlpatterns = [
     path('all-statistics', AverageRatingView.as_view(), name='charts'),
     path('all-count', views.all_count, name='all_count'),
+    path('all-ratings', views.all_ratings, name='all_ratings'),
     path('movies', MovieCountView.as_view(), name='movie'),
     path('movies-chart', views.movies_chart, name='movies_charts'),
     path('movies-rating', views.movies_ratings, name='movies_ratings'),

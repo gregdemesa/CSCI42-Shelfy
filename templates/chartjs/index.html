@@ -40,6 +40,11 @@
         <canvas id="all_count" data-url="{% url 'charts:all_count' %}"></canvas>
       </div>
     </div>
+    <div class="col-sm">
+      <div id="container" style="width: 100%;">
+        <canvas id="all_ratings" data-url="{% url 'charts:all_ratings' %}"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -100,5 +105,75 @@ $(function () {
       }
     });
   });
+
+
+  const ratings = document.getElementById('all_ratings');
+    $(function () {
+    var $all_ratings = $("#all_ratings");
+
+    console.log("Canvas found:", $all_ratings[0]);
+    
+    $.ajax({
+        url: $all_ratings.data("url"),
+        success: function (data) {
+          console.log('AJAX data:', data);  // Debug: Check if data is correct
+
+          var rating = $all_ratings[0].getContext("2d");
+
+          // Log to ensure that the context is set up correctly
+          console.log('Canvas context:', rating);
+          console.log('Canvas element:', $all_ratings[0]);
+
+          // Initialize the chart
+          new Chart(rating, {
+            type: 'bar',
+            data: {
+              labels: data.rating,
+              datasets: [{
+                label: 'Movies',
+                backgroundColor: 'blue',
+                data: data.movie,
+              },
+              {
+                label: 'Books',
+                backgroundColor: 'red',
+                data: data.book,
+              },
+              {
+                label: 'Games',
+                backgroundColor: 'green',
+                data: data.game,
+              }
+            ]
+            },
+            options: {
+              responsive: true,
+              legend: {
+                position: 'top',
+              },
+              title: {
+                display: true,
+                text: 'All Ratings'
+              },
+              scales: {
+                xAxes: [{
+                  stacked: true
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        precision: 0
+                    },
+                    stacked: true
+                }]
+              }
+            }
+          });
+        },
+        error: function (err) {
+          console.error("Error fetching data", err);
+        }
+      });
+    });
 </script>
 {% endblock scripts %}

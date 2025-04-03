@@ -49,7 +49,94 @@ def all_count(request):
         'movie_count': movie_count,
         'book_count': book_count,
         'game_count': game_count
-    })   
+    }) 
+
+def all_ratings(request):
+    ratings_count = defaultdict(int)
+
+    all_rating = UserLibraryItem.objects.values_list("rating", flat=True)
+    all_rating = list(filter(None, all_rating))
+    # Gets All Movie ratings
+    movie_ratings_count = defaultdict(int)
+    movie_rating = UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True)
+    movie_rating = list(filter(None, movie_rating))
+    # Gets All Book ratings
+    book_ratings_count = defaultdict(int)
+    book_rating = UserLibraryItem.objects.filter(media__media_type__iexact="book").values_list("rating", flat=True)
+    book_rating = list(filter(None, book_rating))
+    # Gets All Game ratings
+    game_ratings_count = defaultdict(int)
+    game_rating = UserLibraryItem.objects.filter(media__media_type__iexact="game").values_list("rating", flat=True)
+    game_rating = list(filter(None, game_rating))
+
+    for rate in all_rating:
+        ratings_count[rate]+=1
+    for rate in movie_rating:
+        movie_ratings_count[rate]+=1
+    for rate in book_rating:
+        book_ratings_count[rate]+=1
+    for rate in game_rating:
+        game_ratings_count[rate]+=1
+
+    #for rate in all_rating:
+        # if the a game has been rated, rate, add +1 to game_ratings_count[rate]
+        # else, initialize as 0
+
+    for rate in all_rating:
+        if not movie_ratings_count[rate]:
+            movie_ratings_count[rate] == 0
+        if not book_ratings_count[rate]:
+            book_ratings_count[rate] == 0
+        if not game_ratings_count[rate]:
+            game_ratings_count[rate] == 0
+        
+        
+
+
+    rating = list(ratings_count.keys())
+    all_counts = list(ratings_count.values())
+
+    ratings_all_data = list(zip(rating,all_counts))
+    
+    ratings_all_data.sort(key=lambda x: x[0])
+
+    sorted_rating, sorted_rating_counts = zip(*ratings_all_data)
+
+    # return JsonResponse(data={
+    #     'rating': sorted_rating,
+    #     'movie': sorted_rating_counts
+    # })
+
+    movies = list(movie_ratings_count.keys())
+    movies_count = list(movie_ratings_count.values())
+
+    books = list(book_ratings_count.keys())
+    books_count = list(book_ratings_count.values())
+
+    games = list(game_ratings_count.keys())
+    games_count = list(game_ratings_count.values())
+
+    movies_count_data = list(zip(movies, movies_count))
+    books_count_data = list(zip(books, books_count))
+    games_count_data = list(zip(games, games_count))
+
+    movies_count_data.sort(key=lambda x: x[0])
+    books_count_data.sort(key=lambda x: x[0])
+    games_count_data.sort(key=lambda x: x[0])
+
+    sorted_movies, sorted_movies_count = zip(*movies_count_data)
+    sorted_books, sorted_books_count = zip(*books_count_data)
+    sorted_games, sorted_games_count = zip(*games_count_data)
+
+    return JsonResponse(data={
+        'rating': sorted_rating,
+        'movie_rating': sorted_movies,
+        'movie': sorted_movies_count,
+        'book_rating': sorted_books,
+        'book': sorted_books_count,
+        'game_rating': sorted_games,
+        'game': sorted_games_count
+    })
 
 class MovieCountView(ListView):
     model = UserLibraryItem
@@ -60,13 +147,9 @@ class MovieCountView(ListView):
         movie_count = len(UserLibraryItem.objects.filter(media__media_type__iexact="movie"))
         movie_rating = UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True)
         movie_rating = list(filter(None, movie_rating))
-        max_movie_rating = max(UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True))
-        min_movie_rating = min(UserLibraryItem.objects.filter(media__media_type__iexact="movie").values_list("rating", flat=True))
         context['movie_count'] = movie_count
         context['movie_rating'] = round(sum(movie_rating)/len(movie_rating),2)
-        context['max_movie_rating'] = max_movie_rating
-        context['min_movie_rating'] = min_movie_rating
-    
+        
         return context
     
 
