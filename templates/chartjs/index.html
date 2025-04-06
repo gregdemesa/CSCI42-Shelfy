@@ -14,39 +14,61 @@
 </head> 
 
 {% block content %}
+{% if rating %}
+    <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <p class="text-center">Average Star Rating</p>
+        <p class="text-center">{{ rating }} ★</p>
+      </div>
+      {% if movie_rating %}
+        <div class="col-sm">
+          <p class="text-center">Average Movie Star Rating</p>
+          <p class="text-center">{{ movie_rating }} ★</p>
+        </div>
+      {% else %}
+        <div class="col-sm">
+          <p class="text-center">Please rate at least one movie before seeing your statistics.</p>
+        </div>
+      {% endif %}
+      {% if book_rating %}
+        <div class="col-sm">
+          <p class="text-center">Average Book Star Rating</p>
+          <p class="text-center">{{ book_rating }} ★</p>
+        </div>
+      {% else %}
+        <div class="col-sm">
+          <p class="text-center">Please rate at least one book before seeing your statistics.</p>
+        </div>
+      {% endif %}
+      {% if game_rating %}
+        <div class="col-sm">
+          <p class="text-center">Average Game Star Rating</p>
+          <p class="text-center">{{ game_rating }} ★</p>
+        </div>
+      {% else %}
+      <div class="col-sm">
+        <p class="text-center">Please rate at least one game before seeing your statistics.</p>
+      </div>
+      {% endif %}
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div id="container" style="width: 100%;">
+          <canvas id="all_count" data-url="{% url 'charts:all_count' %}"></canvas>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div id="container" style="width: 100%;">
+          <canvas id="all_ratings" data-url="{% url 'charts:all_ratings' %}"></canvas>
+        </div>
+      </div>
+    </div>
+    </div>
+{% else %}
+<p class="text-center">Please rate at least one movie/book/game before seeing your statistics.</p>
+{% endif %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-3">
-      <p class="text-center">Average Star Rating</p>
-      <p class="text-center">{{ rating }} ★</p>
-    </div>
-    <div class="col-sm">
-      <p class="text-center">Average Movie Star Rating</p>
-      <p class="text-center">{{ movie_rating }} ★</p>
-    </div>
-    <div class="col-sm">
-      <p class="text-center">Average Book Star Rating</p>
-      <p class="text-center">{{ book_rating }} ★</p>
-    </div>
-    <div class="col-sm">
-      <p class="text-center">Average Game Star Rating</p>
-      <p class="text-center">{{ game_rating }} ★</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm">
-      <div id="container" style="width: 100%;">
-        <canvas id="all_count" data-url="{% url 'charts:all_count' %}"></canvas>
-      </div>
-    </div>
-    <div class="col-sm">
-      <div id="container" style="width: 100%;">
-        <canvas id="all_ratings" data-url="{% url 'charts:all_ratings' %}"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock content %}
 
