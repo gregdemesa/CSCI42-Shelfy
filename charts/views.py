@@ -84,7 +84,7 @@ class MovieView(ListView):
 
     def get_context_data(self, **kwargs): 
         context = super().get_context_data(**kwargs)
-        movie_count = len(UserLibraryItem.objects.filter(user=self.request.user, media__media_type__iexact="movie"))
+        movie_count = len(UserLibraryItem.objects.filter(user=self.request.user, status='completed', media__media_type__iexact="movie"))
         context['movie_count'] = movie_count
         context['movie_rating'] = get_average_rating(self.request, 'movie')
         
@@ -97,7 +97,7 @@ class BookView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) 
-        book_count = len(UserLibraryItem.objects.filter(user=self.request.user, media__media_type__iexact="book"))
+        book_count = len(UserLibraryItem.objects.filter(user=self.request.user, status='completed', media__media_type__iexact="book"))
         context['book_count'] = book_count
         context['book_rating'] = get_average_rating(self.request, 'book')
         
@@ -109,7 +109,7 @@ class GameView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        game_count = len(UserLibraryItem.objects.filter(user=self.request.user, media__media_type__iexact="game"))
+        game_count = len(UserLibraryItem.objects.filter(user=self.request.user, status='completed', media__media_type__iexact="game"))
         context['game_count'] = game_count
         context['game_rating'] = get_average_rating(self.request, 'game')
         
@@ -117,9 +117,9 @@ class GameView(ListView):
     
 # Count of All Media Types
 def all_count(request):
-    movie_count = len(UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="movie"))
-    book_count = len(UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="book"))
-    game_count = len(UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="game"))
+    movie_count = len(UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="movie"))
+    book_count = len(UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="book"))
+    game_count = len(UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="game"))
 
     return JsonResponse(data={
         'movie_count': movie_count,
@@ -135,13 +135,13 @@ def all_ratings(request):
 
     # Get ratings per media type
     movie_ratings_count = count_ratings(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="movie").values_list("rating", flat=True)
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="movie").values_list("rating", flat=True)
     )
     book_ratings_count = count_ratings(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="book").values_list("rating", flat=True)
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="book").values_list("rating", flat=True)
     )
     game_ratings_count = count_ratings(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="game").values_list("rating", flat=True)
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="game").values_list("rating", flat=True)
     )
 
     # Get the overall ratings count
@@ -172,7 +172,7 @@ def all_ratings(request):
 # count of movie ratings
 def movies_ratings(request):
     movie_ratings_count = count_ratings(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="movie").values_list("rating", flat=True)
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="movie").values_list("rating", flat=True)
     )
     
     movies_count_data = sort_data(movie_ratings_count)
@@ -186,7 +186,7 @@ def movies_ratings(request):
 
 def books_ratings(request):
     book_ratings_count = count_ratings(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="book").values_list("rating", flat=True)
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="book").values_list("rating", flat=True)
     )
     
     books_count_data = sort_data(book_ratings_count)
@@ -200,7 +200,7 @@ def books_ratings(request):
 
 def games_ratings(request):
     ratings_count = count_ratings(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="game").values_list("rating", flat=True)
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="game").values_list("rating", flat=True)
     )
     
     count_data = sort_data(ratings_count)
@@ -219,7 +219,7 @@ def movies_chart(request):
     genre_count = defaultdict(int)
     
     # Query all movies
-    movie_genre = UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="movie")
+    movie_genre = UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="movie")
     
     # Count the number of movies in each genre
     for entry in movie_genre:
@@ -252,7 +252,7 @@ def movies_chart(request):
 def books_chart(request):
     genre_count = defaultdict(int)
     
-    book_genre = UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="book")
+    book_genre = UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="book")
     
     for entry in book_genre:
         genres = entry.media.genre.split("/")
@@ -277,7 +277,7 @@ def books_chart(request):
 def games_chart(request):
     genre_count = defaultdict(int)
     
-    game_genre = UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="game")
+    game_genre = UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="game")
     
     for entry in game_genre:
         genres = entry.media.genre.split(",")
@@ -305,7 +305,7 @@ Functions for Release Years
 
 def movies_release_years(request):
     movie_release_years_count = count_release_years(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="movie")
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="movie")
     )
     
     movies_count_data = sort_data(movie_release_years_count)
@@ -319,7 +319,7 @@ def movies_release_years(request):
 
 def books_release_years(request):
     book_release_years_count = count_release_years(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="book")
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="book")
     )
     
     books_count_data = sort_data(book_release_years_count)
@@ -333,7 +333,7 @@ def books_release_years(request):
 
 def games_release_years(request):
     release_years_count = count_release_years(
-        UserLibraryItem.objects.filter(user=request.user, media__media_type__iexact="game")
+        UserLibraryItem.objects.filter(user=request.user, status='completed', media__media_type__iexact="game")
     )
     
     count_data = sort_data(release_years_count)

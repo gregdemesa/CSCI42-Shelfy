@@ -60,7 +60,7 @@
 
  </div>
 {% else %}
-<p>Please rate a game first before viewing your statistics.</p>
+<p>Please complete and rate a game first before viewing your statistics.</p>
 {% endif %}
 
 {% endblock content %}
@@ -280,7 +280,7 @@
               data: {
                 labels: data.release_year,
                 datasets: [{
-                  label: 'games',
+                  label: 'Games',
                   backgroundColor: 'blue',
                   data: data.game
                 }]
