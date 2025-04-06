@@ -7,7 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user_management.urls')),
     path('library/', include('user_library.urls')),
-
+    path('socials/', include('socials.urls')),
     # Home page URLs
     path('', home_view, name='home'),
     path('home/', home_view, name='home_alt'),
