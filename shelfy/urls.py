@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from .views import MediaSearchView, MediaDetailView, home_view
+from .views import MediaSearchView, MediaDetailView, home_view, SearchSuggestionsView, books_view, movies_view, games_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,8 +14,15 @@ urlpatterns = [
 
     # Search and detail URLs
     path('search/', MediaSearchView.as_view(), name='media_search'),
+    path('search/suggestions/', SearchSuggestionsView.as_view(),
+         name='search_suggestions'),
     path('<str:media_type>/<str:external_id>/',
          MediaDetailView.as_view(), name='media_detail'),
+
+    # Media type specific views
+    path('books/', books_view, name='books'),
+    path('movies/', movies_view, name='movies'),
+    path('games/', games_view, name='games'),
 
     # Authentication URLs
     path('login/', auth_views.LoginView.as_view(template_name='user_management/login.html'), name='login'),
