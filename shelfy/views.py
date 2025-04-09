@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from django.db import connection
 import random
 import json
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Media
 
 # Import the MediaAPIClient
 from .api_utils import MediaAPIClient
@@ -362,3 +365,22 @@ def games_view(request):
     }
 
     return render(request, 'media/games.html', context)
+
+def media_detail_api(request, media_type, external_id):
+    """API endpoint to get media details for the modal view"""
+    media = get_object_or_404(Media, media_type=media_type, external_id=external_id)
+    
+    # Return media details as JSON
+    return JsonResponse({
+        'title': media.title,
+        'cover_image': media.cover_image,
+        'description': media.description,
+        'author': media.author,
+        'director': media.director,
+        'studio': media.studio,
+        'release_year': media.release_year,
+        'genre': media.genre,
+        'media_type': media.media_type,
+        'external_id': media.external_id,
+    })
+

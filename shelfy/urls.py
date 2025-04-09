@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from .views import MediaSearchView, MediaDetailView, home_view, SearchSuggestionsView, books_view, movies_view, games_view
+from .views import MediaSearchView, MediaDetailView, home_view, SearchSuggestionsView, books_view, movies_view, games_view, media_detail_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,4 +37,8 @@ urlpatterns = [
         template_name='user_management/password_reset/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
         template_name='user_management/password_reset/password_reset_complete.html'), name='password_reset_complete'),
+
+
+   # API endpoints for modal views
+    path('api/media/<str:media_type>/<str:external_id>/', media_detail_api, name='media_detail_api'),
 ]
