@@ -4,222 +4,257 @@
 
 {% block content %}
 <style>
-  .media-header {
-      background: linear-gradient(135deg, #FF6B6B 0%, #833ab4 100%);
-      padding: 4rem 0;
-      border-radius: 20px;
-      margin-bottom: 3rem;
-      position: relative;
-      overflow: hidden;
-      color: white;
-  }
-  
-  .dark-mode .media-header {
-      background: linear-gradient(135deg, #ec4899 0%, #7e22ce 100%);
-  }
-  
-  .media-header::before {
-      content: '';
-      position: absolute;
-      top: -50px;
-      right: -50px;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 0;
-  }
-  
-  .media-section {
-      margin-bottom: 3rem;
-  }
-  
-  .section-title {
-      position: relative;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      display: flex;
-      align-items: center;
-  }
-  
-  .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 80px;
-      height: 3px;
-      background: var(--secondary);
-      border-radius: 3px;
-  }
-  
-  .dark-mode .section-title::after {
-      background: #ec4899;
-  }
-  
-  .section-title .section-icon {
-      margin-right: 0.75rem;
-      font-size: 1.5rem;
-      color: var(--secondary);
-  }
-  
-  .dark-mode .section-title .section-icon {
-      color: #f472b6;
-  }
-  
-  .media-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1.5rem;
-  }
-  
-  .media-card {
-      transition: all 0.3s ease;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      background-color: var(--white);
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-  }
-  
-  .dark-mode .media-card {
-      background-color: #1e293b;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .media-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  }
-  
-  .media-img {
-      height: 250px;
-      background-color: #f0f0f0;
-      overflow: hidden;
-  }
-  
-  .dark-mode .media-img {
-      background-color: #374151;
-  }
-  
-  .media-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-  }
-  
-  .media-card:hover .media-img img {
-      transform: scale(1.05);
-  }
-  
-  .media-content {
-      padding: 1rem;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-  }
-  
-  .media-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 0.3rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-  }
-  
-  .media-director {
-      font-size: 0.8rem;
-      color: var(--gray);
-      margin-bottom: 0.5rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-  }
-  
-  .dark-mode .media-director {
-      color: #cbd5e1;
-  }
-  
-  .media-year {
-      font-size: 0.8rem;
-      color: var(--gray);
-      margin-bottom: 0.5rem;
-  }
-  
-  .dark-mode .media-year {
-      color: #cbd5e1;
-  }
-  
-  .media-card .btn {
-      margin-top: auto;
-  }
-  
-  .category-tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-  }
-  
-  .category-tab {
-      padding: 0.5rem 1.5rem;
-      border-radius: 50px;
-      background-color: #f8f9fa;
-      color: var(--dark);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: none;
-  }
-  
-  .dark-mode .category-tab {
-      background-color: #1e293b;
-      color: #f8fafc;
-  }
-  
-  .category-tab:hover {
-      background-color: #e9ecef;
-      transform: translateY(-2px);
-  }
-  
-  .dark-mode .category-tab:hover {
-      background-color: #2d3748;
-  }
-  
-  .category-tab.active {
-      background-color: var(--secondary);
-      color: white;
-  }
-  
-  .dark-mode .category-tab.active {
-      background-color: #ec4899;
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-      .media-grid {
-          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      }
-      
-      .media-img {
-          height: 200px;
-      }
-  }
-  
-  @media (max-width: 576px) {
-      .media-grid {
-          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      }
-      
-      .media-img {
-          height: 180px;
-      }
-  }
+.media-header {
+    background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+    padding: 4rem 0;
+    border-radius: 24px;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    box-shadow: 0 20px 40px rgba(236, 72, 153, 0.2);
+}
+
+.dark-mode .media-header {
+    background: linear-gradient(135deg, #BE185D 0%, #DB2777 100%);
+    box-shadow: 0 20px 40px rgba(190, 24, 93, 0.3);
+}
+
+.media-header::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+}
+
+.media-header h1 {
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.media-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.media-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--secondary);
+    border-radius: 3px;
+}
+
+.dark-mode .section-title::after {
+    background: var(--secondary-light);
+}
+
+.section-title .section-icon {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--secondary);
+}
+
+.dark-mode .section-title .section-icon {
+    color: var(--secondary-light);
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.8rem;
+}
+
+.media-card {
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.media-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.media-img {
+    height: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    background-color: #F3F4F6;
+    position: relative;
+}
+
+.dark-mode .media-img {
+    background-color: #2D3748;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.media-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.media-card:hover .media-img {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.media-card:hover .media-img img {
+    transform: scale(1.08);
+}
+
+.media-content {
+    padding: 1.2rem 0.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.media-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark-mode .media-title {
+    color: var(--light);
+}
+
+.media-director {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark-mode .media-director {
+    color: #9CA3AF;
+}
+
+.media-year {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-bottom: 0.8rem;
+}
+
+.dark-mode .media-year {
+    color: #9CA3AF;
+}
+
+.media-card .btn {
+    margin-top: auto;
+    border-radius: 50px;
+    padding: 0.5rem 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.media-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(236, 72, 153, 0.3);
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.category-tab {
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    background-color: #F9FAFB;
+    color: var(--dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .category-tab {
+    background-color: #1E293B;
+    color: var(--light);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.category-tab:hover {
+    background-color: #F3F4F6;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .category-tab:hover {
+    background-color: #2D3748;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.category-tab.active {
+    background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-light) 100%);
+    color: white;
+    box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
+}
+
+.dark-mode .category-tab.active {
+    background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-light) 100%);
+    box-shadow: 0 4px 10px rgba(236, 72, 153, 0.5);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .media-img {
+        height: 220px;
+    }
+}
+
+@media (max-width: 576px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+    
+    .media-img {
+        height: 180px;
+    }
+}
 </style>
 
 <!-- Header Section -->
@@ -361,7 +396,6 @@
   <div class="media-grid">
       {% for movie in scifi_movies %}
       <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
-          <a href="{% url 'media_detail' media_type=movieforloop.counter|add:100}}">
           <a href="{% url 'media_detail' media_type=movie.media_type external_id=movie.external_id %}" class="text-decoration-none">
               <div class="media-img">
                   <img src="{{ movie.cover_image }}" alt="{{ movie.title }}">
@@ -388,4 +422,3 @@
   </div>
 </section>
 {% endblock %}
-
