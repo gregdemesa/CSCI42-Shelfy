@@ -62,10 +62,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_library',
+<<<<<<<<< Temporary merge branch 1
     'shelfy',
     'user_management',
-    'charts'
+=========
+    'user_library',
+    'shelfy',
+    'user_management'
+>>>>>>>>> Temporary merge branch 2
 ]
 
 MIDDLEWARE = [
@@ -130,7 +134,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -149,8 +152,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 LOGIN_URL = "/login"
-LOGOUT_REDIRECT_URL = '/login'
-LOGIN_REDIRECT_URL = 'user_management:dashboard'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/user/dashboard'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
