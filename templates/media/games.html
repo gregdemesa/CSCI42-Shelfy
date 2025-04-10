@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+
+{% block title %}Games - SHELFY{% endblock %}
+
+{% block content %}
+<style>
+.media-header {
+    background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
+    padding: 4rem 0;
+    border-radius: 24px;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+}
+
+.dark-mode .media-header {
+    background: linear-gradient(135deg, #0E7490 0%, #0891B2 100%);
+    box-shadow: 0 20px 40px rgba(14, 116, 144, 0.3);
+}
+
+.media-header::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+}
+
+.media-header h1 {
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.media-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.media-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 3px;
+}
+
+.dark-mode .section-title::after {
+    background: #22D3EE;
+}
+
+.section-title .section-icon {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+.dark-mode .section-title .section-icon {
+    color: #22D3EE;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.8rem;
+}
+
+.media-card {
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.media-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.media-img {
+    height: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    background-color: #F3F4F6;
+    position: relative;
+}
+
+.dark-mode .media-img {
+    background-color: #2D3748;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.media-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.media-card:hover .media-img {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.media-card:hover .media-img img {
+    transform: scale(1.08);
+}
+
+.media-content {
+    padding: 1.2rem 0.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.media-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark-mode .media-title {
+    color: var(--light);
+}
+
+.media-studio {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark-mode .media-studio {
+    color: #9CA3AF;
+}
+
+.media-year {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-bottom: 0.8rem;
+}
+
+.dark-mode .media-year {
+    color: #9CA3AF;
+}
+
+.media-card .btn {
+    margin-top: auto;
+    border-radius: 50px;
+    padding: 0.5rem 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.media-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(6, 182, 212, 0.3);
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.category-tab {
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    background-color: #F9FAFB;
+    color: var(--dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .category-tab {
+    background-color: #1E293B;
+    color: var(--light);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.category-tab:hover {
+    background-color: #F3F4F6;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .category-tab:hover {
+    background-color: #2D3748;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.category-tab.active {
+    background: linear-gradient(90deg, var(--accent) 0%, #22D3EE 100%);
+    color: white;
+    box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
+}
+
+.dark-mode .category-tab.active {
+    background: linear-gradient(90deg, var(--accent) 0%, #22D3EE 100%);
+    box-shadow: 0 4px 10px rgba(6, 182, 212, 0.5);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .media-img {
+        height: 220px;
+    }
+}
+
+@media (max-width: 576px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+    
+    .media-img {
+        height: 180px;
+    }
+}
+</style>
+
+<!-- Header Section -->
+<section class="media-header text-center">
+  <div class="container">
+      <h1 class="display-4 fw-bold mb-4" data-aos="fade-up">Explore Games</h1>
+      <p class="lead mb-5" data-aos="fade-up" data-aos-delay="100">
+          Discover amazing gaming experiences across all platforms and genres.
+      </p>
+      
+      <div class="d-flex justify-content-center flex-wrap gap-3" data-aos="fade-up" data-aos-delay="200">
+          <a href="{% url 'media_search' %}?media_type=game" class="btn btn-light btn-lg">
+              <i class="fas fa-search me-2"></i>Search Games
+          </a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'user_library:index' %}" class="btn btn-outline-light btn-lg">
+              <i class="fas fa-gamepad me-2"></i>My Game Collection
+          </a>
+          {% endif %}
+      </div>
+  </div>
+</section>
+
+<!-- Featured Games Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-star section-icon"></i>
+      Featured Games
+  </h2>
+  
+  <div class="media-grid">
+      {% for game in games %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=game.media_type external_id=game.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ game.title }}</h3>
+              <div class="media-studio">
+                  {% if game.studio %}{{ game.studio }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if game.release_year %}{{ game.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ game.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ game.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+
+<!-- RPG Games Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-dragon section-icon"></i>
+      Role-Playing Games
+  </h2>
+  
+  <div class="media-grid">
+      {% for game in rpg_games %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=game.media_type external_id=game.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ game.title }}</h3>
+              <div class="media-studio">
+                  {% if game.studio %}{{ game.studio }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if game.release_year %}{{ game.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ game.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ game.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+
+<!-- Action Games Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-fire section-icon"></i>
+      Action Games
+  </h2>
+  
+  <div class="media-grid">
+      {% for game in action_games %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=game.media_type external_id=game.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ game.title }}</h3>
+              <div class="media-studio">
+                  {% if game.studio %}{{ game.studio }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if game.release_year %}{{ game.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ game.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ game.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+
+<!-- Indie Games Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-lightbulb section-icon"></i>
+      Indie Games
+  </h2>
+  
+  <div class="media-grid">
+      {% for game in indie_games %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=game.media_type external_id=game.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ game.title }}</h3>
+              <div class="media-studio">
+                  {% if game.studio %}{{ game.studio }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if game.release_year %}{{ game.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ game.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ game.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+{% endblock %}

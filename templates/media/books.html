@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+
+{% block title %}Books - SHELFY{% endblock %}
+
+{% block content %}
+<style>
+.media-header {
+    background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+    padding: 4rem 0;
+    border-radius: 24px;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+}
+
+.dark-mode .media-header {
+    background: linear-gradient(135deg, #4C1D95 0%, #6D28D9 100%);
+    box-shadow: 0 20px 40px rgba(76, 29, 149, 0.3);
+}
+
+.media-header::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+}
+
+.media-header h1 {
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.media-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.media-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+.dark-mode .section-title::after {
+    background: var(--primary-light);
+}
+
+.section-title .section-icon {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.dark-mode .section-title .section-icon {
+    color: var(--primary-light);
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.8rem;
+}
+
+.media-card {
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.media-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.media-img {
+    height: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    background-color: #F3F4F6;
+    position: relative;
+}
+
+.dark-mode .media-img {
+    background-color: #2D3748;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.media-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.media-card:hover .media-img {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.media-card:hover .media-img img {
+    transform: scale(1.08);
+}
+
+.media-content {
+    padding: 1.2rem 0.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.media-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark-mode .media-title {
+    color: var(--light);
+}
+
+.media-author {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark-mode .media-author {
+    color: #9CA3AF;
+}
+
+.media-year {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-bottom: 0.8rem;
+}
+
+.dark-mode .media-year {
+    color: #9CA3AF;
+}
+
+.media-card .btn {
+    margin-top: auto;
+    border-radius: 50px;
+    padding: 0.5rem 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.media-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.category-tab {
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    background-color: #F9FAFB;
+    color: var(--dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .category-tab {
+    background-color: #1E293B;
+    color: var(--light);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.category-tab:hover {
+    background-color: #F3F4F6;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .category-tab:hover {
+    background-color: #2D3748;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.category-tab.active {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+}
+
+.dark-mode .category-tab.active {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.5);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .media-img {
+        height: 220px;
+    }
+}
+
+@media (max-width: 576px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+    
+    .media-img {
+        height: 180px;
+    }
+}
+</style>
+
+<!-- Header Section -->
+<section class="media-header text-center">
+  <div class="container">
+      <h1 class="display-4 fw-bold mb-4" data-aos="fade-up">Explore Books</h1>
+      <p class="lead mb-5" data-aos="fade-up" data-aos-delay="100">
+          Discover new stories, expand your knowledge, and escape into different worlds.
+      </p>
+      
+      <div class="d-flex justify-content-center flex-wrap gap-3" data-aos="fade-up" data-aos-delay="200">
+          <a href="{% url 'media_search' %}?media_type=book" class="btn btn-light btn-lg">
+              <i class="fas fa-search me-2"></i>Search Books
+          </a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'user_library:index' %}" class="btn btn-outline-light btn-lg">
+              <i class="fas fa-book me-2"></i>My Book Collection
+          </a>
+          {% endif %}
+      </div>
+  </div>
+</section>
+
+<!-- Featured Books Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-star section-icon"></i>
+      Featured Books
+  </h2>
+  
+  <div class="media-grid">
+      {% for book in books %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=book.media_type external_id=book.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ book.title }}</h3>
+              <div class="media-author">
+                  {% if book.author %}by {{ book.author }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if book.release_year %}{{ book.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ book.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ book.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+
+<!-- Fiction Books Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-book section-icon"></i>
+      Fiction Books
+  </h2>
+  
+  <div class="media-grid">
+      {% for book in fiction_books %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=book.media_type external_id=book.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ book.title }}</h3>
+              <div class="media-author">
+                  {% if book.author %}by {{ book.author }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if book.release_year %}{{ book.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ book.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ book.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+
+<!-- Non-Fiction Books Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-graduation-cap section-icon"></i>
+      Non-Fiction Books
+  </h2>
+  
+  <div class="media-grid">
+      {% for book in nonfiction_books %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=book.media_type external_id=book.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ book.title }}</h3>
+              <div class="media-author">
+                  {% if book.author %}by {{ book.author }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if book.release_year %}{{ book.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ book.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ book.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+
+<!-- Classic Books Section -->
+<section class="container media-section">
+  <h2 class="section-title" data-aos="fade-up">
+      <i class="fas fa-bookmark section-icon"></i>
+      Classic Literature
+  </h2>
+  
+  <div class="media-grid">
+      {% for book in classic_books %}
+      <div class="media-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+          <a href="{% url 'media_detail' media_type=book.media_type external_id=book.external_id %}" class="text-decoration-none">
+              <div class="media-img">
+                  <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+              </div>
+          </a>
+          <div class="media-content">
+              <h3 class="media-title">{{ book.title }}</h3>
+              <div class="media-author">
+                  {% if book.author %}by {{ book.author }}{% endif %}
+              </div>
+              <div class="media-year">
+                  {% if book.release_year %}{{ book.release_year }}{% endif %}
+              </div>
+              
+              <form method="POST" action="{% url 'user_library:add' %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="media_type" value="{{ book.media_type }}">
+                  <input type="hidden" name="external_id" value="{{ book.external_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Library</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+{% endblock %}
