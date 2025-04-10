@@ -11,11 +11,13 @@ class MediaAPIClient:
             "detail": "https://www.googleapis.com/books/v1/volumes/{id}",
             "params": lambda q: {"q": q, "key": settings.GOOGLE_BOOKS_API_KEY},
         },
+        """
         "movie": {
             "search": "https://api.themoviedb.org/3/search/movie",
             "detail": "https://api.themoviedb.org/3/movie/{id}",
             "params": lambda q: {"query": q, "api_key": settings.TMDB_API_KEY},
         },
+        """
         "game": {
             "search": "https://api.rawg.io/api/games",
             "detail": "https://api.rawg.io/api/games/{id}",
@@ -68,6 +70,7 @@ class MediaAPIClient:
                 }
                 for item in data.get("items", [])
             ]
+        """
         if media_type == "movie":
             return [
                 {
@@ -80,6 +83,7 @@ class MediaAPIClient:
                 }
                 for movie in data.get("results", [])
             ]
+        """
         if media_type == "game":
             return [
                 {
@@ -106,6 +110,7 @@ class MediaAPIClient:
                 "genre": ", ".join(volume.get("categories", [])),
                 "author": ", ".join(volume.get("authors", [])),
             }
+        """
         if media_type == "movie":
             return {
                 "title": data.get("title"),
@@ -119,6 +124,7 @@ class MediaAPIClient:
                     None
                 ),
             }
+        """
         if media_type == "game":
             return {
                 "title": data.get("name"),

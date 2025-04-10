@@ -48,6 +48,7 @@ class SearchSuggestionsView(View):
                 "author": book.get("author", "")
             })
 
+        """
         # Get movie suggestions
         movie_results = MediaAPIClient.search_media(query, "movie")[:2]
         for movie in movie_results:
@@ -58,6 +59,7 @@ class SearchSuggestionsView(View):
                 "image": movie["cover_image"],
                 "year": movie.get("release_year", "")
             })
+        """
 
         # Get game suggestions
         game_results = MediaAPIClient.search_media(query, "game")[:1]
@@ -255,9 +257,11 @@ def home_view(request):
     trending_books = MediaAPIClient.search_media("bestseller", "book")[:6]
     context['trending_books'] = trending_books
 
+    """
     # Trending movies
     trending_movies = MediaAPIClient.search_media("popular", "movie")[:6]
     context['trending_movies'] = trending_movies
+    """
 
     # Trending games
     trending_games = MediaAPIClient.search_media("top rated", "game")[:6]
@@ -269,13 +273,17 @@ def home_view(request):
         # For now, we'll just use some generic recommendations
         recommended_books = MediaAPIClient.search_media(
             "recommended fiction", "book")[:6]
+        """
         recommended_movies = MediaAPIClient.search_media(
             "must watch", "movie")[:6]
+        """
         recommended_games = MediaAPIClient.search_media("must play", "game")[
             :6]
-
+        """
         context['recommended_media'] = recommended_books + \
             recommended_movies + recommended_games
+        """
+        context['recommended_media'] = recommended_books + recommended_games # temporary
         random.shuffle(context['recommended_media'])
         context['recommended_media'] = context['recommended_media'][:6]
 
@@ -283,11 +291,20 @@ def home_view(request):
     # In a real app, this would query friends' highly rated items
     friend_recommendations = []
     friend_books = MediaAPIClient.search_media("award winning", "book")[:2]
+    """
     friend_movies = MediaAPIClient.search_media(
         "critically acclaimed", "movie")[:2]
+    """
     friend_games = MediaAPIClient.search_media("indie", "game")[:2]
 
+    """
     for item in friend_books + friend_movies + friend_games:
+        item['friend'] = random.choice(
+            ["Alex", "Jordan", "Taylor", "Casey", "Morgan"])
+        friend_recommendations.append(item)
+    """
+    # temporary
+    for item in friend_books + friend_games:
         item['friend'] = random.choice(
             ["Alex", "Jordan", "Taylor", "Casey", "Morgan"])
         friend_recommendations.append(item)
@@ -320,11 +337,11 @@ def books_view(request):
 
     return render(request, 'media/books.html', context)
 
-
+"""
 def movies_view(request):
-    """
+
     View for displaying movies.
-    """
+
     # Get movies from API
     movies = MediaAPIClient.search_media("popular", "movie")[:12]
 
@@ -342,6 +359,7 @@ def movies_view(request):
     }
 
     return render(request, 'media/movies.html', context)
+"""
 
 
 def games_view(request):
@@ -383,4 +401,3 @@ def media_detail_api(request, media_type, external_id):
         'media_type': media.media_type,
         'external_id': media.external_id,
     })
-

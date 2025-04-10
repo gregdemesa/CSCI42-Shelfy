@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 GOOGLE_BOOKS_API_KEY = os.getenv('GOOGLE_BOOKS_API_KEY')
-TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+# TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 RAWG_API_KEY = os.getenv('RAWG_API_KEY')
 
 # CSRF Settings
