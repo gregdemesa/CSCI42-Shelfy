@@ -8,6 +8,7 @@ urlpatterns = [
     path('user/', include('user_management.urls')),
     path('library/', include('user_library.urls')),
     path('socials/', include('socials.urls')),
+    path('statistics/', include('charts.urls', namespace ='statistics')),
     # Home page URLs
     path('', home_view, name='home'),
     path('home/', home_view, name='home_alt'),
