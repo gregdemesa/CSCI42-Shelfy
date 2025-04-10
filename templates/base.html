@@ -909,94 +909,92 @@ footer {
   </style>
 </head>
 <body style="background-image: linear-gradient(to right, #8fb4ff, #fff4ab);">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-      <div class="container">
-          <!-- Brand -->
-          <a class="navbar-brand" href="{% url 'user_management:dashboard' %}">
-              <i class="fas fa-book-open me-2"></i>SHELFY
-          </a>
-          
-          <!-- Mobile Toggle -->
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-              <i class="fas fa-bars"></i>
-          </button>
-          
-          <!-- Navbar Content -->
-          <div class="collapse navbar-collapse" id="navbarContent">
-              <!-- Navigation Links -->
-              <ul class="navbar-nav mx-auto">
-                  <li class="nav-item">
-                      <a class="nav-link active" href="{% url 'home' %}">
-                          <i class="fas fa-home me-1"></i> Home
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'books' %}">
-                          <i class="fas fa-book me-1"></i> Books
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'games' %}">
-                          <i class="fas fa-gamepad me-1"></i> Games
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'movies' %}">
-                          <i class="fas fa-film me-1"></i> Movies
-                      </a>
-                  </li>
-                  <!-- Search Form -->
-                  <div class="search-container">
-                      <form class="d-flex" action="{% url 'media_search' %}" method="get">
-                          <input class="form-control search-input" type="search" name="q" id="searchInput" placeholder="Search books, movies, games..." aria-label="Search">
-                          <button class="search-btn" type="submit">
-                              <i class="fas fa-search"></i>
-                          </button>
-                      </form>
-                      <div class="search-suggestions" id="searchSuggestions"></div>
-                  </div>
-              </ul>
-              
-              
-              
-              <!-- Right Side: Auth & Dark Mode -->
-              <div class="d-flex align-items-center">
-                  <!-- Dark Mode Toggle -->
-                  <button class="dark-mode-toggle me-3" id="darkModeToggle">
-                      <i class="fas fa-moon" id="darkModeIcon"></i>
-                  </button>
-                  
-                  <!-- Auth Buttons -->
-                  {% if request.user.is_authenticated %}
-                      <div class="dropdown">
-                          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="fas fa-user-circle me-1"></i> Profile
-                          </button>
-                          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                              <li>
-                                  <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
-                                      <i class="fas fa-user-edit me-2"></i> Dashboard
-                                  </a>
-                              </li>
-                              <li><hr class="dropdown-divider"></li>
-                              <li>
-                                  <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
-                                      <i class="fas fa-user-circle me-2"></i> Socials
-                                  </a>
-                              </li>
-                              <li><hr class="dropdown-divider"></li>
-                              <li>
-                                  <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
-                                      <i class="fas fa-folder-open me-2"></i> My Library
-                                  </a>
-                              </li>
-                              <li><hr class="dropdown-divider"></li>
-                              <li>
-                                  <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
-                                      <i class="fas fa-bar-chart me-2"></i> Statistics
-                                  </a>
-                              </li>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="{% url 'user_management:dashboard' %}">
+                <i class="fas fa-book-open me-2"></i>SHELFY
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Navigation Links -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/home">
+                            <i class="fas fa-home navbar-icon"></i> 
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-book navbar-icon"></i> 
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-gamepad navbar-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-film navbar-icon"></i>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex mx-auto" action="{% url 'media_search' %}" method="get" style="width: 40%;">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="q" placeholder="Search books, games, movies..." aria-label="Search">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Right Side: Auth & Dark Mode -->
+                <div class="d-flex align-items-center">
+                    <!-- Dark Mode Toggle -->
+                    <button class="dark-mode-toggle me-3" id="darkModeToggle">
+                        <i class="fas fa-moon" id="darkModeIcon"></i>
+                    </button>
+                    
+                    <!-- Auth Buttons -->
+                    {% if request.user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i> Profile
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'user_management:update_profile' %}">
+                                        <i class="fas fa-user-edit me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/socials">
+                                        <i class="fas fa-user-circle me-2"></i> Socials
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/library">
+                                        <i class="fas fa-folder-open me-2"></i> My Library
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="">
+                                        <i class="fas fa-bar-chart me-2"></i> Statistics
+                                    </a>
+                                </li>
 
                               <li><hr class="dropdown-divider"></li>
                               <li>
